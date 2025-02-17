@@ -32,7 +32,7 @@ public class StartScene : MonoBehaviour
     {
         init_text = GameObject.Find("StartText").GetComponent<TextMeshProUGUI>();
         GetLocalIPAddress();
-        CoordinateFrame.isBimanual = false;
+        CoordinateFrame.isBimanual = true;
         overlayKeyboard = TouchScreenKeyboard.Open("Enter IP of your PC", TouchScreenKeyboardType.Default);
         init_text.text = "Gripper selected, A: save and continue";
         isGripper = true;
@@ -60,14 +60,7 @@ public class StartScene : MonoBehaviour
         }
         if (OVRInput.GetUp(OVRInput.RawButton.A))
         {
-            if (isLeapHand || isBimanual)
-            {
-                SceneManager.LoadScene("HandSelect");
-            }
-            else if (isGripper)
-            {
-                SceneManager.LoadScene("GripperSelect");
-            }
+            SceneManager.LoadScene("LeftGripperSelect");
         }
     }
 }

@@ -20,10 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Custom/Scenes/Start.unity
     guid: aec6daef83f5bcb49aa2c5b21b338d98
-  - enabled: 1
+  - enabled: 0
     path: Assets/Custom/Scenes/HandSelect.unity
     guid: b5dfedfcefae4764bba0798d6ca0dfd3
-  - enabled: 1
+  - enabled: 0
     path: Assets/Custom/Scenes/HandCollection.unity
     guid: a64d4b489237b5e44b7f6b8eb99a5d23
   - enabled: 0
@@ -39,14 +39,20 @@ EditorBuildSettings:
     path: Assets/RealSenseSDK2.0/Scenes/Samples/PointCloudProcessingBlocks.unity
     guid: 9029980bf604b504c8b5473f02bd774f
   - enabled: 1
-    path: Assets/Custom/Scenes/GripperSelect.unity
+    path: Assets/Custom/Scenes/LeftGripperSelect.unity
     guid: 48860e6de4444814f9da3317660e64a2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Custom/Scenes/GripperCollection.unity
     guid: d58ac786b76804b40a51df8da58113e8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Custom/Scenes/BimanualCollection.unity
     guid: 1ab2ea5bd1e00f745b68f93c90cb206a
+  - enabled: 1
+    path: Assets/Custom/Scenes/RightGripperSelect.unity
+    guid: ff90b3e7ebd3c7443a2ae4a992d4ba75
+  - enabled: 1
+    path: Assets/Custom/Scenes/GripperBimanualCollection.unity
+    guid: 0cc93f2bf7ce9fa42adf6055663504d4
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 7dc924bb27a54ae49b2b998c2868fcdc,
       type: 2}
