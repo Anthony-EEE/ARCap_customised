@@ -119,6 +119,7 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
         Vector3 rightWristPos = cameraRig.rightHandAnchor.position + cameraRig.rightHandAnchor.rotation * right_pos_offset;
         Quaternion leftWristRot = cameraRig.leftHandAnchor.rotation; //* rotateXinv * rotateZXinv;
         Quaternion rightWristRot = cameraRig.rightHandAnchor.rotation;// * rotateX * rotateZX;
+        updateVisSpheres();
         //updateVisSpheres(hand, leftWristPos, leftWristRot, rightWristPos, rightWristRot);
         // if time gap > 0.05 send hand pose
         if (Time.time - current_time > 0.02)
@@ -192,6 +193,18 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
             return (dist1 + dist2)/2;
         }
         
+    }
+
+    private void updateVisSpheres()
+    {
+        spheres[0].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
+        spheres[1].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
+        spheres[2].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position;
+        spheres[3].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position;
+        spheres[4].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
+        spheres[5].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
+        spheres[6].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position;
+        spheres[7].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position;
     }
 
     private void checkVirtualAup()
