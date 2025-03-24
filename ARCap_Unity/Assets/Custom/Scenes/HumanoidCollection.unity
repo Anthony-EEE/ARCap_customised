@@ -18839,7 +18839,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TimeText: {fileID: 534142101}
-  local_ip: 10.5.6.83
+  local_ip: 192.170.72.158
   listen_port: 65432
   sender_port: 12346
 --- !u!1 &1885281270

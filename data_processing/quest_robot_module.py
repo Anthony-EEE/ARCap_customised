@@ -686,4 +686,73 @@ class QuestHumanoidModule(QuestRobotModule):
             msg += f",{q[i]:.3f}"
         msg += f",{rel_pos[0]:.3f},{rel_pos[1]:.3f},{rel_pos[2]:.3f},{rel_rot[0]:.3f},{rel_rot[1]:.3f},{rel_rot[2]:.3f},{rel_rot[3]:.3f}"
         self.ik_result_s.sendto(msg.encode(), self.ik_result_dest)
-
+import winsound
+class QuestNaviModule(QuestRobotModule):
+    def __init__(self, vr_ip, local_ip, pose_cmd_port, ik_result_port, vis_sp=None):
+        super().__init__(vr_ip, local_ip, pose_cmd_port, ik_result_port)
+        self.data_dir = None
+        self.prev_data_dir = self.data_dir
+        quest_tf = np.load("configs/calibration.npz")
+        depth_tf = np.load("configs/tf_camera.npz")
+        depth_R = Rotation.from_matrix(depth_tf["R"])
+        depth_t = depth_tf["t"]
+        quest_R = Rotation.from_quat(quest_tf["rel_rot"])
+        quest_t = quest_tf["rel_pos"]
+        self.delta_orn = quest_R.inv() * depth_R
+        self.delta_pos = quest_R.inv().apply(depth_t - quest_t)
+    
+    # World frame marks beginning of a program.
+    def receive(self):
+        data, _ = self.wrist_listener_s.recvfrom(1024)
+        data_string = data.decode()
+        now = datetime.datetime.now()
+        #print(data_string)
+        if data_string.startswith("WorldFrame"):
+            data_string = data_string[11:]
+            data_string = data_string.split(",")
+            data_list = [float(data) for data in data_string]
+            world_frame = np.array(data_list)
+            self.world_frame = world_frame
+            self.wf_receive_ts = now.strftime("%Y-%m-%d-%H-%M-%S")
+            os.mkdir(f"data/{self.wf_receive_ts}")
+            np.save(f"data/{self.wf_receive_ts}/WorldFrame.npy", world_frame)
+            return None
+        elif data_string.startswith("Start"):
+            winsound.Beep(1000,300)
+            winsound.Beep(1000,300)
+            formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+            self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+            os.mkdir(self.data_dir)
+            return None
+        elif data_string.startswith("Stop"):
+            formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+            if self.data_dir is not None:
+                self.prev_data_dir = self.data_dir
+                winsound.Beep(1000,300)
+                winsound.Beep(800,300)
+            self.data_dir = None
+            
+            return None
+        elif data_string.startswith("Remove"):
+            if self.data_dir is not None and os.path.exists(self.data_dir):
+                shutil.rmtree(self.data_dir)
+            elif self.prev_data_dir is not None and os.path.exists(self.prev_data_dir):
+                shutil.rmtree(self.prev_data_dir)
+            self.data_dir = None
+            self.prev_data_dir = None
+            return None
+        elif data_string.find("Head") != -1:
+            data_string_ = data_string[6:].split(",")
+            data_list = [float(data) for data in data_string_]
+            head_tf = np.array(data_list[:7])
+            rel_head_pos, rel_head_rot = self.compute_rel_transform(head_tf)
+            # Compute camera pose
+            world_camera_pos = Rotation.from_quat(rel_head_rot).apply(self.delta_pos) + rel_head_pos
+            world_camera_rot = Rotation.from_quat(rel_head_rot) * self.delta_orn
+            if self.data_dir is None and data_string[0] == "Y":
+                winsound.Beep(1000,300)
+                winsound.Beep(1000,300)
+                formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+                self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+                os.mkdir(self.data_dir)
+            return (world_camera_pos, world_camera_rot.as_quat())

@@ -211,9 +211,9 @@ def read_data(path, target_path, delta_orn, delta_pos, stride):
         vis.destroy_window()
 
 depth_tf = np.load("configs/tf_camera.npz")
+quest_tf = np.load("configs/calibration.npz")
 depth_R = Rotation.from_matrix(depth_tf["R"])
 depth_t = depth_tf["t"]
-quest_tf = np.load("configs/calibration.npz")
 quest_R = Rotation.from_quat(quest_tf["rel_rot"])
 quest_t = quest_tf["rel_pos"]
 delta_orn = quest_R.inv() * depth_R

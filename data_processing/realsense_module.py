@@ -1,6 +1,7 @@
 import pyrealsense2 as rs
 import numpy as np
 import open3d as o3d
+import cv2
 
 # Depth camera related functions and constants
 class DepthCameraModule:
@@ -87,6 +88,20 @@ class DepthCameraModule:
                 self.vis.update_renderer()
         return np.hstack([vis_verts, vis_colors])
 
+    def receive_image(self):
+        frames = self.pipeline.wait_for_frames()
+        depth_frame = frames.get_depth_frame()
+        color_frame = frames.get_color_frame()
+        depth_image = np.asanyarray(depth_frame.get_data(), np.uint16)
+        color_image = np.asanyarray(color_frame.get_data(), np.uint8)
+        if self.visualize:
+            cv2.imshow("depth", depth_image)
+            cv2.imshow("color", color_image)
+            cv2.waitKey(1)
+        return color_image, depth_image
+
+
+
     def close(self):
         self.pipeline.stop()
         if self.visualize:
@@ -94,11 +109,11 @@ class DepthCameraModule:
 
 if __name__ == "__main__":
     import time
-    camera = DepthCameraModule(is_decimate=False, visualize=False)
+    camera = DepthCameraModule(is_decimate=False, visualize=True)
     cnt = 0
     ts = time.time()
     while True:
-        camera.receive()
+        camera.receive_image()
         cnt += 1
         if cnt % 30 == 0:
             print(f"FPS: {30/(time.time()-ts)}")

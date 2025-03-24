@@ -211,7 +211,7 @@ public class JointController : MonoBehaviour
             //root.GetComponent<ArticulationBody>().TeleportRoot(rootPos, rootRot*original_rot);
             root.transform.position = rootPos;
             root.transform.rotation = rootRot;
-            m_Text.text = "robot pose updated!"+rootPos[0]+","+rootPos[1]+","+rootPos[2];
+            //m_Text.text = "robot pose updated!"+rootPos[0]+","+rootPos[1]+","+rootPos[2];
         }
     }
 }

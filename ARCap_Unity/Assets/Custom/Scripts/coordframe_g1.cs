@@ -44,7 +44,7 @@ public class CoordinateFrameG1 : MonoBehaviour
     private IPEndPoint targetEndPoint;
     private TextMeshProUGUI init_text;
     private TouchScreenKeyboard overlayKeyboard;
-    private bool data_collection_mode = true;
+    private bool manip_data_collection_mode = true;
     void Start()
     {
         frame = GameObject.Find("coordinate");
@@ -55,7 +55,6 @@ public class CoordinateFrameG1 : MonoBehaviour
         sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         init_text = GameObject.Find("InitialText").GetComponent<TextMeshProUGUI>();
         init_text.text = "Data collection, Y: Place robot";
-        remote_ip = pc_ip;
         GetLocalIPAddress();
         //targetEndPoint = new IPEndPoint(IPAddress.Parse(pc_ip), sender_port);
     }
@@ -108,13 +107,13 @@ public class CoordinateFrameG1 : MonoBehaviour
             }
             else
             {
-                if(remote_ip==pc_ip)
+                if(manip_data_collection_mode)
                 {
-                    init_text.text = "Data collection Y: Place robot";
+                    init_text.text = "Collect manipulation data Y: Place robot";
                 }
                 else
                 {
-                    init_text.text = "Deploy Y: Place robot";
+                    init_text.text = "Collect navigation data Y: Place robot";
                 }
             }
         }
@@ -124,24 +123,18 @@ public class CoordinateFrameG1 : MonoBehaviour
             // Save world frame
             last_pos = current_pos;
             last_rot = cum_rot;
-            if(data_collection_mode)
-            {
-                remote_ip = pc_ip;
-            }
-            else
-            {
-                remote_ip = ws_ip;
-            }
+            remote_ip = pc_ip;
             targetEndPoint = new IPEndPoint(IPAddress.Parse(remote_ip), sender_port);
             saveWorldFrame(last_pos, last_rot);
             sender.Close(); // Free the socket
         }
         if (OVRInput.GetUp(OVRInput.RawButton.B))
         {
-            data_collection_mode = true;
+            overlayKeyboard = TouchScreenKeyboard.Open("Enter PC IP", TouchScreenKeyboardType.Default);
+            manip_data_collection_mode = false;
             if(!isFreezeUpdate)
             {
-                init_text.text = "Data collection Y: Place robot";
+                init_text.text = "Collect navigation data Y: Place robot";
             }
             else
             {
@@ -151,11 +144,11 @@ public class CoordinateFrameG1 : MonoBehaviour
         }
         if (OVRInput.GetUp(OVRInput.RawButton.A))
         {
-            overlayKeyboard = TouchScreenKeyboard.Open("Enter Workstation IP", TouchScreenKeyboardType.Default);
-            data_collection_mode = false;
+            overlayKeyboard = TouchScreenKeyboard.Open("Enter PC IP", TouchScreenKeyboardType.Default);
+            manip_data_collection_mode = true;
             if(!isFreezeUpdate)
             {
-                init_text.text = "Deploy Y: Place robot";
+                init_text.text = "Collect manipulation data Y: Place robot";
             }
             else
             {
@@ -166,12 +159,20 @@ public class CoordinateFrameG1 : MonoBehaviour
         {
             isClicked = false;
             init_text.text = "Clicked";
-            SceneManager.LoadScene("HumanoidCollection");
+            if (manip_data_collection_mode)
+            {
+                SceneManager.LoadScene("HumanoidCollection");
+            }
+            else
+            {
+                SceneManager.LoadScene("NavigationCollection");
+            }
             
         }
         if(overlayKeyboard != null && overlayKeyboard.status == TouchScreenKeyboard.Status.Done)
         {
-            ws_ip = overlayKeyboard.text;
+            pc_ip = overlayKeyboard.text;
+            remote_ip = pc_ip;
         }
     }
 }

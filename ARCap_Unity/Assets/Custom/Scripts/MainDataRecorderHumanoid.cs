@@ -31,8 +31,10 @@ public class MainDataRecorderHumanoid : MonoBehaviour
     private Quaternion rotateZXinv = Quaternion.Euler(45f, 0f, -90f);
     private Quaternion rotateX = Quaternion.Euler(-20f, -25f, -25f);
     private Quaternion rotateXinv = Quaternion.Euler(-30f, 25f, 25f);
-    private Vector3 right_pos_offset = new Vector3(0.1f, -0.02f, -0.07f); //+/-: [down/up, right/left, front/back]
-    private Vector3 left_pos_offset = new Vector3(-0.1f, -0.04f, -0.07f);
+    // private Vector3 right_pos_offset = new Vector3(0.1f, -0.02f, -0.07f); //+/-: [down/up, right/left, front/back]
+    // private Vector3 left_pos_offset = new Vector3(-0.1f, -0.04f, -0.07f);
+    private Vector3 right_pos_offset = new Vector3(0f, 0f, 0f); //+/-: [down/up, right/left, front/back]
+    private Vector3 left_pos_offset = new Vector3(0f, 0f, 0f);
 
 
     private string folder_path;
