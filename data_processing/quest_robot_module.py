@@ -7,7 +7,8 @@ from scipy.spatial.transform import Rotation
 import pybullet as pb
 import shutil
 from rigidbodySento import create_primitive_shape
-
+import redis
+import pickle
 # For different robot, just write different QuestRightArmLeapModule classes
 class QuestRobotModule:
     def __init__(self,  vr_ip, local_ip, pose_cmd_port, ik_result_port=None):
@@ -1090,3 +1091,137 @@ class QuestBimanualGripperNoRokokoModule(QuestRobotModule):
         self.last_arm_q = arm_q
         self.last_hand_q = hand_q
         return np.hstack([l_action, r_action])
+    
+
+class QuestBimanualLeapNoRokokoModule(QuestRobotModule):
+    PREGRASP_INDEX = np.array([0.0, 0.0, 0.0])
+    PREGRASP_MIDDLE = np.array([0.0, 0.0, 0.0])
+    PREGRASP_THUMB = np.array([np.pi/2, 0.0, -np.pi/2.5])
+    PINCH_INDEX = np.array([0.0, np.pi/2, np.pi/3])
+    PINCH_MIDDLE = np.array([0.0, 0.0, 0.0])
+    PINCH_THUMB = np.array([np.pi/2.5, 0.0, np.pi/4])
+    POWER_INDEX = np.array([0.0, np.pi/2, np.pi/3])
+    POWER_MIDDLE = np.array([np.pi/6, np.pi/2, np.pi/3])
+    POWER_THUMB = np.array([np.pi/2, 0.0, np.pi/4])
+    def __init__(self, vr_ip, local_ip, pose_cmd_port, ik_result_port, vis_sp=None):
+        super().__init__(vr_ip, local_ip, pose_cmd_port, ik_result_port)
+        self.vis_sp = vis_sp
+        # Initialize robots
+        self.left_hand = pb.loadURDF("assets/tri_leap_hand/robot_3finger_left.urdf", flags=pb.URDF_MERGE_FIXED_LINKS, basePosition=[0.0, -0.1, 0.0])
+        self.right_hand = pb.loadURDF("assets/tri_leap_hand/robot_3finger_right.urdf", flags=pb.URDF_MERGE_FIXED_LINKS, basePosition=[0.0, 0.1, 0.0])
+        self.data_dir = None
+        self.prev_data_dir = self.data_dir
+        self.fingertips = np.zeros((6,3), dtype=np.float32)
+        self.last_arm_q = None
+        self.last_hand_q = None
+        self.last_action = [1,1]
+        self.last_action_t = [time.time()] * 2
+        self.is_open = [True, True]
+        self.redis_client = redis.Redis("localhost", port=6379, db=0)
+    
+    def solve_fingertip_ik(self, fingertips):
+        left_tips = fingertips[:3] * np.array([1,-1, 1])
+        right_tips = fingertips[3:]
+        if left_tips[0,1] < -0.04 and left_tips[1,1] > -0.03 and left_tips[2,1] > -0.03:
+            left_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.PREGRASP_THUMB, QuestBimanualLeapNoRokokoModule.PREGRASP_MIDDLE, QuestBimanualLeapNoRokokoModule.PREGRASP_INDEX])
+            q = np.hstack([QuestBimanualLeapNoRokokoModule.PREGRASP_INDEX, QuestBimanualLeapNoRokokoModule.PREGRASP_MIDDLE, QuestBimanualLeapNoRokokoModule.PREGRASP_THUMB]) * np.array([-1, 1, 1, -1, 1, 1, -1, -1, -1])
+            self.redis_client.set("hand_target_q", pickle.dumps(q))
+        elif left_tips[0,1] < -0.04 and left_tips[1,1] < -0.03 and left_tips[2,1] > -0.03:
+            left_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.PINCH_THUMB, QuestBimanualLeapNoRokokoModule.PINCH_MIDDLE, QuestBimanualLeapNoRokokoModule.PINCH_INDEX])
+            q = np.hstack([QuestBimanualLeapNoRokokoModule.PINCH_INDEX, QuestBimanualLeapNoRokokoModule.PINCH_MIDDLE, QuestBimanualLeapNoRokokoModule.PINCH_THUMB]) * np.array([-1, 1, 1, -1, 1, 1, -1, -1, -1])
+            self.redis_client.set("hand_target_q", pickle.dumps(q))
+        elif left_tips[0,1] < -0.04 and left_tips[1,1] < -0.03 and left_tips[2,1] < -0.03:
+            left_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.POWER_THUMB, QuestBimanualLeapNoRokokoModule.POWER_MIDDLE, QuestBimanualLeapNoRokokoModule.POWER_INDEX])
+            q = np.hstack([QuestBimanualLeapNoRokokoModule.POWER_INDEX, QuestBimanualLeapNoRokokoModule.POWER_MIDDLE, QuestBimanualLeapNoRokokoModule.POWER_THUMB]) * np.array([-1, 1, 1, -1, 1, 1, -1, -1, -1])
+            self.redis_client.set("hand_target_q", pickle.dumps(q))
+        else:
+            left_hand_q = np.zeros(9, dtype=np.float32)
+            self.redis_client.set("hand_target_q", pickle.dumps(np.zeros(9, dtype=np.float32)))
+        if right_tips[0,1] < -0.04 and right_tips[1,1] > -0.03 and right_tips[2,1] > -0.03:
+            right_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.PREGRASP_THUMB, QuestBimanualLeapNoRokokoModule.PREGRASP_MIDDLE, QuestBimanualLeapNoRokokoModule.PREGRASP_INDEX])
+        elif right_tips[0,1] < -0.04 and right_tips[1,1] < -0.03 and right_tips[2,1] > -0.03:
+            right_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.PINCH_THUMB, QuestBimanualLeapNoRokokoModule.PINCH_MIDDLE, QuestBimanualLeapNoRokokoModule.PINCH_INDEX])
+        elif right_tips[0,1] < -0.04 and right_tips[1,1] < -0.03 and right_tips[2,1] < -0.03:
+            right_hand_q = np.hstack([QuestBimanualLeapNoRokokoModule.POWER_THUMB, QuestBimanualLeapNoRokokoModule.POWER_MIDDLE, QuestBimanualLeapNoRokokoModule.POWER_INDEX])
+        else:
+            right_hand_q = np.zeros(9, dtype=np.float32)
+        return left_hand_q, right_hand_q
+        
+
+    def solve_system_world(self, fingertip_pos):
+        left_hand_q, right_hand_q = self.solve_fingertip_ik(fingertip_pos)
+        self.set_joint_positions(self.left_hand, left_hand_q)
+        self.set_joint_positions(self.right_hand, right_hand_q)
+        return np.hstack([left_hand_q, right_hand_q])
+            
+    # World frame marks beginning of a program.
+    def receive(self):
+        data, _ = self.wrist_listener_s.recvfrom(1024)
+        data_string = data.decode()
+        now = datetime.datetime.now()
+        #print(data_string)
+        if data_string.startswith("WorldFrame"):
+            data_string = data_string[11:]
+            data_string = data_string.split(",")
+            data_list = [float(data) for data in data_string]
+            world_frame = np.array(data_list)
+            self.world_frame = world_frame
+            self.wf_receive_ts = now.strftime("%Y-%m-%d-%H-%M-%S")
+            os.mkdir(f"data/{self.wf_receive_ts}")
+            np.save(f"data/{self.wf_receive_ts}/WorldFrame.npy", world_frame)
+            return None, None, None
+        elif data_string.startswith("RobotFrame"):
+            return None, None, None
+        elif data_string.startswith("Start"):
+            formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+            self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+            os.mkdir(self.data_dir)
+            return None, None, None
+        elif data_string.startswith("Stop"):
+            formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+            if self.data_dir is not None:
+                self.prev_data_dir = self.data_dir
+            self.data_dir = None
+            return None, None, None
+        elif data_string.startswith("Remove"):
+            if self.data_dir is not None and os.path.exists(self.data_dir):
+                shutil.rmtree(self.data_dir)
+            elif self.prev_data_dir is not None and os.path.exists(self.prev_data_dir):
+                shutil.rmtree(self.prev_data_dir)
+            self.data_dir = None
+            self.prev_data_dir = None
+            return None, None, None
+        elif data_string.find("BHand") != -1:
+            data_string_ = data_string[7:].split(",")
+            data_list = [float(data) for data in data_string_]
+            left_wrist_tf = np.array(data_list[:7])
+            right_wrist_tf = np.array(data_list[7:14])
+            head_tf = np.array(data_list[14:21])
+            fingertips = np.array(data_list[21:]).reshape(6,3) # 3 for left 3 for right
+            self.fingertips = fingertips
+            if self.vis_sp is not None:
+                for i in range(6):
+                    pb.resetBasePositionAndOrientation(self.vis_sp[i], fingertips[i], (0, 0, 0, 1))
+            rel_left_wrist_pos, rel_left_wrist_rot = self.compute_rel_transform(left_wrist_tf)
+            rel_right_wrist_pos, rel_right_wrist_rot = self.compute_rel_transform(right_wrist_tf)
+            rel_head_pos, rel_head_rot = self.compute_rel_transform(head_tf)
+            if self.data_dir is None and data_string[0] == "Y":
+                formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+                self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+                os.mkdir(self.data_dir)
+            return (rel_left_wrist_pos, rel_left_wrist_rot), (rel_right_wrist_pos, rel_right_wrist_rot), (rel_head_pos, rel_head_rot)
+    
+    def get_fingertips(self):
+        return self.fingertips[:3], self.fingertips[3:]
+
+    def send_ik_result(self, hand_q):
+        if self.data_dir is None:
+            delta_result = "G"
+        else:
+            delta_result = "Y"
+        msg = f"{delta_result}"
+        for i in range(len(hand_q)):
+            msg += f",{hand_q[i]:.3f}"
+        self.ik_result_s.sendto(msg.encode(), self.ik_result_dest)
+        self.last_hand_q = hand_q
+        return hand_q

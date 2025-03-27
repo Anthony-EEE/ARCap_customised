@@ -20,9 +20,9 @@ public class RightCoordinateFrameGripper : MonoBehaviour
     private bool isClicked = false;
     private bool isFreezeUpdate = false;
     GameObject frame;
-    GameObject robot;
-    GameObject robot_ee;
-    GameObject hand;
+    // GameObject robot;
+    // GameObject robot_ee;
+    // GameObject hand;
     OVRCameraRig cameraRig;
     private Vector3 hand_offset = new Vector3(0.0f, 0.0f, 0.0f);
     private Quaternion hand_rot_offset = Quaternion.Euler(0f, 0f, 0f);
@@ -48,9 +48,9 @@ public class RightCoordinateFrameGripper : MonoBehaviour
     void Start()
     {
         frame = GameObject.Find("coordinate");
-        robot = GameObject.Find("panda_link0");
-        robot_ee = GameObject.Find("panda_hand");
-        hand = GameObject.Find("gripper_base");
+        // robot = GameObject.Find("panda_link0");
+        // robot_ee = GameObject.Find("panda_hand");
+        // hand = GameObject.Find("gripper_base");
         cameraRig = GameObject.Find("OVRCameraRig").GetComponent<OVRCameraRig>();
         folder_path = Application.persistentDataPath + "/" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
         Directory.CreateDirectory(folder_path);
@@ -96,12 +96,12 @@ public class RightCoordinateFrameGripper : MonoBehaviour
         current_pos = last_anchor_pos + cum_dist;
         frame.transform.position = current_pos;
         frame.transform.rotation = cum_rot;
-        robot.transform.position = current_pos;
-        robot.transform.rotation = cum_rot;
+        // robot.transform.position = current_pos;
+        // robot.transform.rotation = cum_rot;
         // Set Palm position to be the same as end effector of the robot
         // Should apply palm offset
-        hand.transform.position = robot_ee.transform.position + robot_ee.transform.rotation * hand_rot_offset * hand_offset;
-        hand.transform.rotation = robot_ee.transform.rotation * hand_rot_offset;
+        // hand.transform.position = robot_ee.transform.position + robot_ee.transform.rotation * hand_rot_offset * hand_offset;
+        // hand.transform.rotation = robot_ee.transform.rotation * hand_rot_offset;
         if (OVRInput.GetUp(OVRInput.RawButton.Y))
         {
             isFreezeUpdate = !isFreezeUpdate;

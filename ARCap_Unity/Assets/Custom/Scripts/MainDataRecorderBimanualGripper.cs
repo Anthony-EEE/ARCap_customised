@@ -40,13 +40,13 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
     private Vector3 lgripper_pos_offset = new Vector3(0f, 0f, 0f);
     private Quaternion lgripper_rot_offset = Quaternion.Euler(0f, 0f, 0f);
 
-    private GameObject rrobot;
-    private GameObject rgripper;
-    private GameObject rrobot_ee;
+    // private GameObject rrobot;
+    // private GameObject rgripper;
+    // private GameObject rrobot_ee;
 
-    private GameObject lrobot;
-    private GameObject lgripper;
-    private GameObject lrobot_ee;
+    // private GameObject lrobot;
+    // private GameObject lgripper;
+    // private GameObject lrobot_ee;
 
     private string folder_path;
     private float current_time = 0.0f;
@@ -64,7 +64,7 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
     private OVRSkeleton l_hand_skeleton;
     private OVRHand r_hand;
     private OVRSkeleton r_hand_skeleton;
-
+    private float[] quest_hand;
     #endregion
 
 
@@ -106,8 +106,8 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
     {
         // Attempt to get the global depth texture
         // This should be a image, get a image and send via redis?
-        rgripper.GetComponent<ArticulationBody>().TeleportRoot(rrobot_ee.transform.position + rrobot_ee.transform.rotation * rgripper_rot_offset * rgripper_pos_offset, rrobot_ee.transform.rotation * rgripper_rot_offset);
-        lgripper.GetComponent<ArticulationBody>().TeleportRoot(lrobot_ee.transform.position + lrobot_ee.transform.rotation * lgripper_rot_offset * lgripper_pos_offset, lrobot_ee.transform.rotation * lgripper_rot_offset);
+        // rgripper.GetComponent<ArticulationBody>().TeleportRoot(rrobot_ee.transform.position + rrobot_ee.transform.rotation * rgripper_rot_offset * rgripper_pos_offset, rrobot_ee.transform.rotation * rgripper_rot_offset);
+        // lgripper.GetComponent<ArticulationBody>().TeleportRoot(lrobot_ee.transform.position + lrobot_ee.transform.rotation * lgripper_rot_offset * lgripper_pos_offset, lrobot_ee.transform.rotation * lgripper_rot_offset);
         
         // Should use left eye anchor pose from OVRCameraRig
         var headPose = cameraRig.centerEyeAnchor.position;
@@ -153,24 +153,18 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
     // record: "Y" or "N"
     private void SendHeadWristPose(string record, Vector3 left_wrist_pos, Quaternion left_wrist_rot, Vector3 right_wrist_pos, Quaternion right_wrist_rot, Vector3 head_pos, Quaternion head_orn)
     {
-        m_TimeText.text = "Before send";
-        float is_left_pinch = checkPinch(true);
-        m_TimeText.text = "Before right";
-        float is_right_pinch = checkPinch(false);
+        computeLocalFingertip();
         string message = record + "BHand:" + left_wrist_pos.x + "," + left_wrist_pos.y + "," + left_wrist_pos.z + "," + left_wrist_rot.x + "," + left_wrist_rot.y + "," + left_wrist_rot.z + "," + left_wrist_rot.w;
         message = message + "," + right_wrist_pos.x + "," + right_wrist_pos.y + "," + right_wrist_pos.z + "," + right_wrist_rot.x + "," + right_wrist_rot.y + "," + right_wrist_rot.z + "," + right_wrist_rot.w;
-        message = message + "," + head_pos.x + "," + head_pos.y + "," + head_pos.z + "," + head_orn.x + "," + head_orn.y + "," + head_orn.z + "," + head_orn.w + "," + is_left_pinch + "," + is_right_pinch;
-        m_TimeText.text = "Message encoded";
+        message = message + "," + head_pos.x + "," + head_pos.y + "," + head_pos.z + "," + head_orn.x + "," + head_orn.y + "," + head_orn.z + "," + head_orn.w;
+        for(int i=0;i<18;i++)
+        {
+            message = message + "," + quest_hand[i];
+        }
         byte[] data = Encoding.UTF8.GetBytes(message);
         sender.SendTo(data, data.Length, SocketFlags.None, targetEndPoint);
-        m_TimeText.text = "After";
     }   
     // Has to be called after updateVisSpheres
-    
-    private float computeDistance(float[] pos1, float[] pos2)
-    {
-        return Mathf.Sqrt(Mathf.Pow(pos1[0] - pos2[0], 2) + Mathf.Pow(pos1[1] - pos2[1], 2) + Mathf.Pow(pos1[2] - pos2[2], 2));
-    }
 
     private float checkPinch(bool is_left)
     {
@@ -199,12 +193,33 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
     {
         spheres[0].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
         spheres[1].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
-        spheres[2].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position;
-        spheres[3].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position;
+        spheres[2].transform.position = (l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position+l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position+l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_PinkyTip].Transform.position)/3.0f;
+        spheres[3].transform.position = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.position;
         spheres[4].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
         spheres[5].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
-        spheres[6].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position;
-        spheres[7].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position;
+        spheres[6].transform.position = (r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position+r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position+r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_PinkyTip].Transform.position)/3.0f;
+        spheres[7].transform.position = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.position;
+    }
+
+    private void computeLocalFingertip()
+    {
+        Vector3 l_root = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.position;
+        Quaternion l_root_rot = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.rotation;
+        Vector3 l_thumb_tip = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
+        Vector3 l_index_tip = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
+        Vector3 l_rest_tip = (l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position+l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position+l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_PinkyTip].Transform.position)/3.0f;
+        Vector3 l_local_thumb = Quaternion.Inverse(l_root_rot) * (l_thumb_tip - l_root);
+        Vector3 l_local_index = Quaternion.Inverse(l_root_rot) * (l_index_tip - l_root);
+        Vector3 l_local_rest = Quaternion.Inverse(l_root_rot) * (l_rest_tip - l_root);
+        Vector3 r_root = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.position;
+        Quaternion r_root_rot = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_WristRoot].Transform.rotation;
+        Vector3 r_thumb_tip = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
+        Vector3 r_index_tip = r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
+        Vector3 r_rest_tip = (r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position+r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_RingTip].Transform.position+r_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_PinkyTip].Transform.position)/3.0f;
+        Vector3 r_local_thumb = Quaternion.Inverse(r_root_rot) * (r_thumb_tip - r_root);
+        Vector3 r_local_index = Quaternion.Inverse(r_root_rot) * (r_index_tip - r_root);
+        Vector3 r_local_rest = Quaternion.Inverse(r_root_rot) * (r_rest_tip - r_root);
+        quest_hand = new float[]{l_local_thumb.x, l_local_thumb.y, l_local_thumb.z, l_local_index.x, l_local_index.y, l_local_index.z, l_local_rest.x, l_local_rest.y, l_local_rest.z, r_local_thumb.x, r_local_thumb.y, r_local_thumb.z, r_local_index.x, r_local_index.y, r_local_index.z, r_local_rest.x, r_local_rest.y, r_local_rest.z};
     }
 
     private void checkVirtualAup()
@@ -291,25 +306,6 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
         }
         // Create a folder with current time world frame is based on right arm
         folder_path = CoordinateFrame.folder_path;
-        // Visualize coordinate frame pos
-        rrobot = GameObject.Find("panda_link0_vis");
-        rrobot_ee = GameObject.Find("panda_hand_vis");
-        rgripper = GameObject.Find("gripper_base_vis_right");
-        GameObject rframe = GameObject.Find("coordinate_vis");
-        
-        lrobot = GameObject.Find("panda_link0_vis_gripper");
-        lrobot_ee = GameObject.Find("panda_hand_vis_gripper");
-        lgripper = GameObject.Find("gripper_base_vis");
-        GameObject lframe = GameObject.Find("coordinate_vis_gripper");
-
-
-        rframe.transform.position = RightCoordinateFrameGripper.last_pos;
-        rframe.transform.rotation = RightCoordinateFrameGripper.last_rot;
-        rrobot.GetComponent<ArticulationBody>().TeleportRoot(RightCoordinateFrameGripper.last_pos, RightCoordinateFrameGripper.last_rot);
-        
-        lframe.transform.position = LeftCoordinateFrameGripper.last_pos;
-        lframe.transform.rotation = LeftCoordinateFrameGripper.last_rot;
-        lrobot.GetComponent<ArticulationBody>().TeleportRoot(LeftCoordinateFrameGripper.last_pos, LeftCoordinateFrameGripper.last_rot);
         // Create sender socket
         sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         targetEndPoint = new IPEndPoint(IPAddress.Parse(LeftCoordinateFrameGripper.remote_ip), sender_port);
@@ -354,23 +350,6 @@ public class MainDataRecorderBimanualGripper : MonoBehaviour
                 image_l.color = new Color32(12, 188, 13, 100);
             }
         }
-        // if(OVRInput.GetUp(OVRInput.RawButton.B))
-        // {
-        //     if(traj_cnt > 0 && !deleted)
-        //     {
-        //         startRemoving = true;
-        //         traj_cnt --;
-        //         deleted = true;
-        //     }
-        //     if(startRecording)
-        //     {
-        //         startRecording = false;
-        //         image_r.color = new Color32(12, 188, 13, 100);
-        //         image_b.color = new Color32(12, 188, 13, 100);
-        //         image_u.color = new Color32(12, 188, 13, 100);
-        //         image_l.color = new Color32(12, 188, 13, 100);
-        //     }
-        // }
         if (!startRecording)
         {
             if (startRemoving)
