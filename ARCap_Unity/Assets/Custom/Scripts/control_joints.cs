@@ -208,9 +208,9 @@ public class JointController : MonoBehaviour
         {
             Vector3 rootPos = new Vector3(rootInput[i++], rootInput[i++], rootInput[i++]);
             Quaternion rootRot = new Quaternion(rootInput[i++], rootInput[i++], rootInput[i++], rootInput[i++]);
-            //root.GetComponent<ArticulationBody>().TeleportRoot(rootPos, rootRot*original_rot);
-            root.transform.position = rootPos;
-            root.transform.rotation = rootRot;
+            root.GetComponent<ArticulationBody>().TeleportRoot(rootPos, rootRot);
+            //root.transform.position = rootPos;
+            //root.transform.rotation = rootRot;
             //m_Text.text = "robot pose updated!"+rootPos[0]+","+rootPos[1]+","+rootPos[2];
         }
     }

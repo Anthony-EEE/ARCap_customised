@@ -821,15 +821,6 @@
       <mass value="0.170"/>
       <inertia ixx="0.00010099485234748" ixy="0.00003618590790516" ixz="-0.00000074301518642" iyy="0.00028135871571621" iyz="0.00000330189743286" izz="0.00021894770413514"/>
     </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="meshes/left_rubber_hand.obj"/>
-      </geometry>
-      <material name="white">
-        <color rgba="0.7 0.7 0.7 1"/>
-      </material>
-    </visual>
   </link>
   <link name="right_shoulder_pitch_link">
     <inertial>
@@ -1045,14 +1036,5 @@
       <mass value="0.170"/>
       <inertia ixx="0.00010099485234748" ixy="-0.00003618590790516" ixz="-0.00000074301518642" iyy="0.00028135871571621" iyz="-0.00000330189743286" izz="0.00021894770413514"/>
     </inertial>
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <mesh filename="meshes/right_rubber_hand.obj"/>
-      </geometry>
-      <material name="white">
-        <color rgba="0.7 0.7 0.7 1"/>
-      </material>
-    </visual>
   </link>
 </robot>
