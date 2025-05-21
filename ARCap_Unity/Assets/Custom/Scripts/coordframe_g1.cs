@@ -144,7 +144,7 @@ public class CoordinateFrameG1 : MonoBehaviour
         }
         if (OVRInput.GetUp(OVRInput.RawButton.A))
         {
-            overlayKeyboard = TouchScreenKeyboard.Open("Enter PC IP", TouchScreenKeyboardType.Default);
+            overlayKeyboard = TouchScreenKeyboard.Open("192.168.110.223", TouchScreenKeyboardType.Default);
             manip_data_collection_mode = true;
             if(!isFreezeUpdate)
             {

@@ -136,14 +136,14 @@ public class MainDataRecorderHumanoid : MonoBehaviour
             }
             current_time = Time.time;
         }
-        if (startRecording)
-        {
-            m_TimeText.text = "Recording:" + traj_cnt;
-        }
-        else
-        {
-            m_TimeText.text = "Not recording";
-        }
+        // if (startRecording)
+        // {
+        //     m_TimeText.text = "Recording:" + traj_cnt;
+        // }
+        // else
+        // {
+        //     m_TimeText.text = "Not recording";
+        // }
         return true;
     }
 
@@ -308,7 +308,7 @@ public class MainDataRecorderHumanoid : MonoBehaviour
     {
         // Attempt to show the render textures
         MainLoop();
-        if  (getVirtualAup())
+        if  (getVirtualAup() && !startRecording)
         {
             startRecording = !startRecording;
             if (startRecording)
@@ -319,7 +319,7 @@ public class MainDataRecorderHumanoid : MonoBehaviour
                 string message = "Start:"+head_pose.x+","+head_pose.y+","+head_pose.z+","+head_rot.x+","+head_rot.y+","+head_rot.z+","+head_rot.w;
                 byte[] data = Encoding.UTF8.GetBytes(message);
                 sender.SendTo(data, data.Length, SocketFlags.None, targetEndPoint);
-                traj_cnt ++;
+                //traj_cnt ++;
                 image_r.color = new Color32(188, 12, 13, 100);
                 image_b.color = new Color32(188, 12, 13, 100);
                 image_u.color = new Color32(188, 12, 13, 100);

@@ -41,6 +41,7 @@ public class JointController : MonoBehaviour
     private TextMeshProUGUI m_Text;
     private string current_txt = "";
     private bool updated = false;
+    private bool cnt_updated = false;
 
     private Vector3 original_pos;
     private Quaternion original_rot;
@@ -104,11 +105,14 @@ public class JointController : MonoBehaviour
             image_r.color = new Color32(188, 12, 13, 100);
             image_b.color = new Color32(188, 12, 13, 100);
             image_u.color = new Color32(188, 12, 13, 100);
-            image_l.color = new Color32(188, 12, 13, 100);
-            if (m_Text.text.Equals("Moving too fast!"))
+            image_l.color = new Color32(188, 12, 13, 100);           
+            m_Text.text = "Recording: "+MainDataRecorderHumanoid.traj_cnt;
+            if (cnt_updated == false)
             {
-                m_Text.text = current_txt;
+                MainDataRecorderHumanoid.traj_cnt++;
+                cnt_updated = true;
             }
+
         }
         else if (commands[0].Equals("G") && data_collector && image_r.enabled)
         {
@@ -116,6 +120,8 @@ public class JointController : MonoBehaviour
             image_b.color = new Color32(12, 188, 13, 100);
             image_u.color = new Color32(12, 188, 13, 100);
             image_l.color = new Color32(12, 188, 13, 100);
+            m_Text.text = "Not Recording";
+            cnt_updated = false;
         }
 
         for (int i=0; i<targetPositions.Count; i++)
@@ -145,9 +151,11 @@ public class JointController : MonoBehaviour
             image_b.color = new Color32(188, 12, 13, 100);
             image_u.color = new Color32(188, 12, 13, 100);
             image_l.color = new Color32(188, 12, 13, 100);
-            if (m_Text.text.Equals("Moving too fast!"))
+            m_Text.text = "Recording: "+MainDataRecorderHumanoid.traj_cnt;
+            if (cnt_updated == false)
             {
-                m_Text.text = current_txt;
+                MainDataRecorderHumanoid.traj_cnt++;
+                cnt_updated = true;
             }
         }
         else if (commands[0].Equals("G") && data_collector && image_r.enabled)
@@ -156,6 +164,8 @@ public class JointController : MonoBehaviour
             image_b.color = new Color32(12, 188, 13, 100);
             image_u.color = new Color32(12, 188, 13, 100);
             image_l.color = new Color32(12, 188, 13, 100);
+            m_Text.text = "Not Recording";
+            cnt_updated = false;
         }
 
         for (int i=0; i<targetPositions.Count; i++)

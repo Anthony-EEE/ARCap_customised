@@ -22,7 +22,7 @@ class DepthCameraModule:
             exit(0)
         
         config.enable_stream(rs.stream.depth, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, rs.format.rgb8, 30)
+        config.enable_stream(rs.stream.color,1920,1080, rs.format.rgb8, 30)
         pipeline.start(config)
         depth_sensor = device.query_sensors()[0]
         if depth_sensor.supports(rs.option.emitter_enabled):
