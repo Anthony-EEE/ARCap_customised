@@ -84,6 +84,79 @@ If you find this repository useful please cite:
     year={2024}
 }
 ```
+### Diagram
+graph TD
+    subgraph "Unity + C# Full APK Development Workflow"
+        subgraph "Step 1: Unity Project Setup"
+            A1[Create new Unity project<br/>Select 3D template] --> A2[Import Meta XR SDK<br/>VR development framework]
+            A2 --> A3[Configure project settings<br/>Android platform + Quest support]
+            A3 --> A4[Create basic folder structure<br/>Assets/Custom/Scripts/Scenes/Models]
+        end
+
+        subgraph "Step 2: Scene System"
+            B1[Create Start.unity scene<br/>App launch interface] --> B2[Create GameObject<br/>Empty object as script carrier]
+            B2 --> B3[Add UI Canvas<br/>Display text and buttons]
+            B3 --> B4[Create Text component<br/>StartText shows hint info]
+            B4 --> B5[Attach start.cs script<br/>to GameObject]
+        end
+
+        subgraph "Step 3: C# Scripting"
+            C1[Write start.cs class<br/>Inherit MonoBehaviour] --> C2[Define variables<br/>UI references and state]
+            C2 --> C3[Start method<br/>Scene initialization logic]
+            C3 --> C4[Update method<br/>Logic executed every frame]
+            C4 --> C5[Custom methods<br/>IP input and scene switching]
+        end
+
+        subgraph "Step 4: Unity Component Binding"
+            D1[GameObject.Find<br/>Find UI components by name] --> D2[GetComponent<br/>Access specific component]
+            D2 --> D3[Assign to script variables<br/>Link C# with Unity]
+            D3 --> D4[Runtime updates<br/>Change UI text and state]
+        end
+
+        subgraph "Step 5: VR-Specific Features"
+            E1[OVRCameraRig<br/>VR camera system] --> E2[OVRInput<br/>Controller input detection]
+            E2 --> E3[TouchScreenKeyboard<br/>Virtual keyboard in VR]
+            E3 --> E4[SceneManager<br/>Manage scene switching]
+        end
+
+        subgraph "Step 6: Multi-Scene Architecture"
+            F1[Start scene<br/>Initialization and config] --> F2[GripperSelect scene<br/>Robot alignment]
+            F2 --> F3[GripperCollection scene<br/>Data collection interface]
+            F3 --> F4[Static variable sharing<br/>Cross-scene data transfer]
+        end
+
+        subgraph "Step 7: APK Build"
+            G1[Build Settings<br/>Add all scenes] --> G2[Player Settings<br/>Package name, version, permissions]
+            G2 --> G3[XR Settings<br/>Enable Oculus support]
+            G3 --> G4[Build and Run<br/>Generate .apk file]
+            G4 --> G5[Deploy to Quest 3<br/>Via ADB or MQDH]
+        end
+    end
+
+    %% Connect each step
+    A4 --> B1
+    B5 --> C1
+    C5 --> D1
+    D4 --> E1
+    E4 --> F1
+    F4 --> G1
+
+    classDef setup fill:#e3f2fd
+    classDef scene fill:#f3e5f5
+    classDef script fill:#e8f5e8
+    classDef binding fill:#fff3e0
+    classDef vr fill:#fce4ec
+    classDef arch fill:#e0f2f1
+    classDef build fill:#ffebee
+
+    class A1,A2,A3,A4 setup
+    class B1,B2,B3,B4,B5 scene
+    class C1,C2,C3,C4,C5 script
+    class D1,D2,D3,D4 binding
+    class E1,E2,E3,E4 vr
+    class F1,F2,F3,F4 arch
+    class G1,G2,G3,G4,G5 build
+
 
 
 
