@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 3025250873
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: d03af685cce99fe0d24513073eb6e45c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 0f9fba26cbb38215f317d1fd6b1954a0
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: d03af685cce99fe0d24513073eb6e45c
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Custom/Models/franka_arm/meshes/visual/link1.obj
+- Assets/Custom/Models/gripper_description/gripper_description/meshes/visual/hand.obj
+- Assets/Custom/Models/gripper_description/gripper_description/meshes/visual/tri_finger.obj
+- Assets/Custom/Models/gripper_description/gripper_description/meshes/collision/hand.obj
+- Assets/Custom/Models/gripper_description/gripper_description/meshes/collision/tri_finger_14cm.obj
+Dependencies:
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_shader0

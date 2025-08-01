@@ -161,14 +161,59 @@ public class MainDataRecorderGripper : MonoBehaviour
         sender.SendTo(data, data.Length, SocketFlags.None, targetEndPoint);
     }   
 
+    // New variables for button-based gripper control
+    private bool gripperClosed = false;
+    private bool lastGripperState = false;
+    
     private float checkPinch()
     {
-        Vector3 l_thumb_tip = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_ThumbTip].Transform.position;
-        Vector3 l_index_tip = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_IndexTip].Transform.position;
-        Vector3 l_middle_tip = l_hand_skeleton.Bones[(int)OVRSkeleton.BoneId.Hand_MiddleTip].Transform.position;
-        float dist1 = Vector3.Distance(l_thumb_tip, l_index_tip);
-        float dist2 = Vector3.Distance(l_thumb_tip, l_middle_tip);
-        return (dist1 + dist2)/2;
+        // Check for simultaneous button presses
+        bool closePressed = OVRInput.GetDown(OVRInput.RawButton.LHandTrigger);
+        bool openPressed = OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger);
+        
+        // Handle conflicting inputs
+        if (closePressed && openPressed)
+        {
+            // Both buttons pressed - ignore input and show warning
+            m_TimeText.text = "CONFLICT: Both buttons pressed! Use one at a time.";
+            return gripperClosed ? 0.0f : 1.0f; // Keep current state
+        }
+        else if (closePressed)
+        {
+            // Only close button pressed
+            gripperClosed = true;
+        }
+        else if (openPressed)
+        {
+            // Only open button pressed
+            gripperClosed = false;
+        }
+        // Add after line 190:
+        Debug.Log($"Gripper state changed to: {(gripperClosed ? "CLOSED" : "OPEN")}");
+        // Alternative button mapping (X/Y buttons):
+        // Uncomment these lines if you prefer X/Y buttons:
+        // bool closeAlt = OVRInput.GetDown(OVRInput.RawButton.X);
+        // bool openAlt = OVRInput.GetDown(OVRInput.RawButton.Y);
+        // if (closeAlt && openAlt) { /* conflict */ }
+        // else if (closeAlt) { gripperClosed = true; }
+        // else if (openAlt) { gripperClosed = false; }
+        
+        // Visual feedback when gripper state changes
+        if (gripperClosed != lastGripperState)
+        {
+            if (gripperClosed)
+            {
+                m_TimeText.text = "Gripper CLOSED";
+            }
+            else
+            {
+                m_TimeText.text = "Gripper OPEN";
+            }
+            lastGripperState = gripperClosed;
+        }
+        
+        // Return gripper state: 0.0 = closed, 1.0 = open
+        return gripperClosed ? 0.0f : 1.0f;
     }
 
     #endregion // Private Methods

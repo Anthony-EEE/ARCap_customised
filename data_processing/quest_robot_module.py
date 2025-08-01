@@ -338,8 +338,21 @@ class QuestLeftArmGripperModule(QuestRobotModule):
         return True
 
     def compute_action(self, this_q): # -1 is open, 1 is close
-        #closing = (np.array(this_q) - np.array(prev_q)) < -0.005
-        #opening = (np.array(this_q) - np.array(prev_q)) > 0.005
+        # Use button-based gripper state instead of threshold calculation
+        # self.is_open is set from Unity button presses in receive() method
+        if hasattr(self, 'is_open'):
+            if self.is_open:  # gripper is open (button state = 1.0)
+                if self.last_action != -1:
+                    self.last_action_t = time.time()
+                self.last_action = -1
+                return -1
+            else:  # gripper is closed (button state = 0.0)
+                if self.last_action != 1:
+                    self.last_action_t = time.time()
+                self.last_action = 1
+                return 1
+        
+        # Fallback to old threshold-based method if button data unavailable
         if time.time() - self.last_action_t < 1.5:
             return self.last_action
         if self.is_closer_than_threshold(this_q, 0.95*(self.left_hand_joint_ranges[0]+self.left_hand_joint_ranges[1])):
@@ -532,8 +545,21 @@ class QuestLeftArmGripperNoRokokoModule(QuestRobotModule):
         return True
 
     def compute_action(self, this_q): # -1 is open, 1 is close
-        #closing = (np.array(this_q) - np.array(prev_q)) < -0.005
-        #opening = (np.array(this_q) - np.array(prev_q)) > 0.005
+        # Use button-based gripper state instead of threshold calculation
+        # self.is_open is set from Unity button presses in receive() method
+        if hasattr(self, 'is_open'):
+            if self.is_open:  # gripper is open (button state = 1.0)
+                if self.last_action != -1:
+                    self.last_action_t = time.time()
+                self.last_action = -1
+                return -1
+            else:  # gripper is closed (button state = 0.0)
+                if self.last_action != 1:
+                    self.last_action_t = time.time()
+                self.last_action = 1
+                return 1
+        
+        # Fallback to old threshold-based method if button data unavailable
         if time.time() - self.last_action_t < 1.5:
             return self.last_action
         if self.is_closer_than_threshold(this_q, 0.95*(self.left_hand_joint_ranges[0]+self.left_hand_joint_ranges[1])):

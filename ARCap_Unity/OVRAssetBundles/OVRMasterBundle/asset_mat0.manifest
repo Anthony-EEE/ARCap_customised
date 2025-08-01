@@ -1,0 +1,55 @@
+ManifestFileVersion: 0
+CRC: 3094255970
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4ac24f76c18b6c873fe6219cd29da57d
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: b30fce1a9ad74efb72be6c308c56e365
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4ac24f76c18b6c873fe6219cd29da57d
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/PURPLE_Storage.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/Wireframe.mat
+- Assets/Custom/Models/franka_arm/Materials/Default.mat
+- Assets/Custom/Models/leap_hand/Materials/dip_material.mat
+- Assets/Custom/Models/leap_hand/Materials/thumb_pip_material.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/BLACK_Window.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/PINK_Bed.mat
+- Assets/Custom/Models/leap_hand/Materials/thumb_dip_material.mat
+- Assets/Custom/Materials/PhysicalDepthGradient.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/RED_Couch.mat
+- Assets/Custom/Models/leap_hand/Materials/mcp_joint_material.mat
+- Assets/Custom/Models/leap_hand/Materials/pip_material.mat
+- Assets/Custom/Models/franka_arm/Materials/panda_white.mat
+- Assets/Custom/Models/leap_hand/Materials/ball_material.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/BLUE_Table.mat
+- Assets/DepthAPISample/Materials/Occluded/TorchOccluded.mat
+- Assets/Custom/Models/leap_hand/Materials/palm_lower_material.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/GREEN_Plant.mat
+- Assets/Custom/Models/franka_leap/Materials/panda_white.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/DARKGRAY_WallArt.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/GRAY_Wall.mat
+- Assets/Custom/Materials/VirtualDepthGradient.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/RoomBoxEffects.mat
+- Assets/Custom/Models/franka_arm/Materials/panda_red.mat
+- Assets/Custom/Models/leap_hand/Materials/thumb_fingertip_material.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/ORANGE_Lamp.mat
+- Packages/com.unity.render-pipelines.universal/Runtime/Materials/Lit.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/BROWN_Door.mat
+- Assets/Custom/Models/leap_hand/Materials/fingertip_material.mat
+- Packages/com.meta.xr.mrutilitykit/Core/Materials/WHITE_Other.mat
+Dependencies:
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_png0
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_shader0

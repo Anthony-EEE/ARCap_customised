@@ -1,0 +1,69 @@
+ManifestFileVersion: 0
+CRC: 1506724712
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c550a1a395a5b9c0a38337f4b3219e29
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: dd7842fb47d6ddd49a5b4c675951b2b8
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: c550a1a395a5b9c0a38337f4b3219e29
+HashAppended: 0
+ClassTypes:
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.FaceInfo_Legacy
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.FontAssetCreationSettings
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.KerningTable
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_Character
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_FontFeatureTable
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_FontWeightPair
+- AssemblyName: Unity.TextMeshPro
+  ClassName: TMPro.TMP_Glyph
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.FaceInfo
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.Glyph
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.GlyphMetrics
+- AssemblyName: UnityEngine.TextCoreFontEngineModule
+  ClassName: UnityEngine.TextCore.GlyphRect
+Assets:
+- Assets/Custom/Models/franka_arm/meshes/collision/link4_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/thumb_fingertip_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link3_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link2_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/palm_lower_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link1_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/fingertip_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link0_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/mcp_joint_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/pip_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/thumb_pip_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link7_1.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/dip_1.asset
+- Assets/Custom/Models/franka_arm/meshes/collision/link5_1.asset
+- Packages/com.meta.xr.sdk.sharedassets/Runtime/Shared/Samples/Fonts/Roboto-Regular
+  SDF.asset
+- Assets/Custom/Models/leap_hand/meshes/collision/thumb_dip_1.asset
+Dependencies:
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_shader0
