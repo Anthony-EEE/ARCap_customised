@@ -432,7 +432,6 @@ class QuestLeftArmGripperModule(QuestRobotModule):
         self.last_hand_q = left_hand_q
         return action
 
-
 class QuestLeftArmGripperNoRokokoModule(QuestRobotModule):
     ARM_REST = [0.,
                 -0.49826458111314524,
@@ -855,3 +854,317 @@ class QuestBimanualModule(QuestRobotModule):
         self.last_arm_q = arm_q
         self.last_hand_q = hand_q
         return np.hstack([action, hand_q[2:]])
+
+class QuestUR3ArmModule(QuestRobotModule):
+    """UR3 6-DOF arm module for trajectory tracking (no gripper)"""
+    
+    # UR3 6-DOF home position (radians)
+    ARM_REST = [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0]
+    JOINT_DAMPING = [1000.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    
+    # UR3-specific offsets for end-effector positioning
+    ur3_pos_offset = np.array([0.0, 0.0, 0.0])
+    ur3_orn_offset = Rotation.from_euler("xyz", [0., 0., 0.])
+    ur3_palm_pos_orn_offset = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    
+    def __init__(self, vr_ip, local_ip, pose_cmd_port, ik_result_port, vis_sp=None):
+        super().__init__(vr_ip, local_ip, pose_cmd_port, ik_result_port)
+        self.vis_sp = vis_sp
+        
+        # Load UR3 robot
+        print("Loading UR3 robot...")
+        
+        # Try multiple UR3 URDF paths
+        ur3_urdf_paths = [
+            # ROS Industrial UR3
+            os.path.join("..", "urdf_files_dataset", "urdf_files", "ros-industrial", "xacro_generated", "universal_robots", "ur_description", "urdf", "ur3.urdf"),
+            # Robotics Toolbox UR3  
+            os.path.join("..", "urdf_files_dataset", "urdf_files", "robotics-toolbox", "xacro_generated", "ur_description", "urdf", "ur3.urdf"),
+            # MATLAB UR3
+            os.path.join("..", "urdf_files_dataset", "urdf_files", "matlab", "ur_description", "urdf", "universalUR3.urdf"),
+            # Absolute path fallbacks
+            "urdf_files_dataset/urdf_files/ros-industrial/xacro_generated/universal_robots/ur_description/urdf/ur3.urdf",
+            "urdf_files_dataset/urdf_files/robotics-toolbox/xacro_generated/ur_description/urdf/ur3.urdf",
+        ]
+        
+        ur3_loaded = False
+        for urdf_path in ur3_urdf_paths:
+            try:
+                print(f"  Trying URDF path: {urdf_path}")
+                self.ur3_arm = pb.loadURDF(
+                    urdf_path, 
+                    basePosition=[0.0, 0.0, 0.0], 
+                    baseOrientation=[0, 0, 0, 1],  # UR3 uses standard orientation
+                    useFixedBase=True
+                )
+                print(f"✅ Successfully loaded UR3 URDF from: {urdf_path}")
+                ur3_loaded = True
+                break
+            except Exception as e:
+                print(f"  ❌ Failed to load {urdf_path}: {str(e)[:100]}...")
+                continue
+        
+        if not ur3_loaded:
+            print("⚠️ All UR3 URDF paths failed, falling back to Panda for testing...")
+            # Fallback to Panda URDF for testing
+            self.ur3_arm = pb.loadURDF(
+                "assets/franka_arm/panda_gripper.urdf", 
+                basePosition=[0.0, 0.0, 0.0], 
+                baseOrientation=[0, 0, 0, 1], 
+                useFixedBase=True
+            )
+        
+        # Find end-effector link for UR3
+        self.end_effector_link = self._find_ur3_end_effector()
+        
+        # Set initial joint positions (will be adjusted after getting joint limits)
+        
+        # Get joint limits and determine actual DOF
+        self.ur3_lower_limits, self.ur3_upper_limits, self.ur3_joint_ranges = self.get_joint_limits(self.ur3_arm)
+        
+        # Adjust joint damping to match actual DOF
+        actual_dof = len(self.ur3_lower_limits)
+        if actual_dof == 6:
+            self.joint_damping = [1000.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # True UR3
+        elif actual_dof == 7:  
+            self.joint_damping = [1000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # Panda fallback
+        else:
+            self.joint_damping = [1000.0] + [0.0] * (actual_dof - 1)  # Generic fallback
+        
+        print(f"  Configured joint damping for {actual_dof} DOF: {self.joint_damping}")
+        
+        # Set initial joint positions based on actual DOF
+        if actual_dof == 6:
+            # True UR3 - use UR3 rest pose
+            initial_pose = QuestUR3ArmModule.ARM_REST
+        elif actual_dof == 7:
+            # Panda fallback - use Panda rest pose
+            initial_pose = [0.0, -0.498, -0.02, -2.473, -0.013, 2.004, -0.723]
+        else:
+            # Generic fallback - all zeros
+            initial_pose = [0.0] * actual_dof
+            
+        self.set_joint_positions(self.ur3_arm, initial_pose)
+        print(f"  Set initial pose for {actual_dof} DOF: {[f'{x:.2f}' for x in initial_pose]}")
+        
+        # Trajectory tracking variables
+        self.data_dir = None
+        self.prev_data_dir = self.data_dir
+        self.last_arm_q = None
+        self.trajectory_points = []
+        
+        print(f"✅ UR3 arm initialized with {len(self.ur3_lower_limits)} DOF, end-effector link: {self.end_effector_link}")
+    
+    def _find_ur3_end_effector(self):
+        """Find the appropriate end-effector link for UR3"""
+        num_joints = pb.getNumJoints(self.ur3_arm)
+        end_effector_link = None
+        
+        print(f"🔍 Searching for UR3 end-effector among {num_joints} joints:")
+        for i in range(num_joints):
+            joint_info = pb.getJointInfo(self.ur3_arm, i)
+            link_name = joint_info[12].decode('utf-8')
+            parent_name = joint_info[1].decode('utf-8')
+            
+            # Priority: tool0 > flange > wrist_3_link
+            if 'tool0' in link_name.lower():
+                end_effector_link = i
+                print(f"✅ Found tool0 link at index {i}: {link_name}")
+                break
+            elif 'flange' in link_name.lower():
+                end_effector_link = i
+                print(f"✅ Found flange link at index {i}: {link_name}")
+            elif 'wrist_3_link' in link_name.lower():
+                end_effector_link = i
+                print(f"✅ Found wrist_3_link at index {i}: {link_name}")
+        
+        # Fallback for Panda or other robots
+        if end_effector_link is None:
+            # Try common end-effector names
+            for i in range(num_joints):
+                joint_info = pb.getJointInfo(self.ur3_arm, i)
+                link_name = joint_info[12].decode('utf-8')
+                if 'hand' in link_name.lower() or 'ee' in link_name.lower():
+                    end_effector_link = i
+                    print(f"✅ Found end-effector at index {i}: {link_name}")
+                    break
+        
+        # Final fallback
+        if end_effector_link is None:
+            end_effector_link = max(0, num_joints - 2)
+            print(f"⚠️ Using fallback end-effector link: index {end_effector_link}")
+        
+        return end_effector_link
+
+    def solve_arm_ik(self, wrist_pos, wrist_orn, wrist_offset=None):
+        """Solve IK for UR3 6-DOF arm"""
+        if wrist_offset is not None:
+            wrist_pos_ = wrist_orn.apply(wrist_offset[:3]) + wrist_pos
+            wrist_orn_ = wrist_orn * Rotation.from_euler("xyz", wrist_offset[3:])
+        else:
+            wrist_pos_ = wrist_pos
+            wrist_orn_ = wrist_orn
+        
+        target_q = pb.calculateInverseKinematics(
+            self.ur3_arm, 
+            self.end_effector_link, 
+            wrist_pos_, 
+            wrist_orn_.as_quat(), 
+            lowerLimits=self.ur3_lower_limits, 
+            upperLimits=self.ur3_upper_limits, 
+            jointRanges=self.ur3_joint_ranges, 
+            restPoses=QuestUR3ArmModule.ARM_REST[:len(self.ur3_lower_limits)],  # Match DOF
+            jointDamping=self.joint_damping,  # Use dynamic damping
+            maxNumIterations=100, 
+            residualThreshold=0.001
+        )
+        
+        # Return only the actual DOF joints as numpy array
+        return np.array(target_q[:len(self.ur3_lower_limits)])
+
+    def solve_system_world(self, wrist_pos, wrist_orn, tip_poses=None):
+        """Solve UR3 arm position for given wrist pose (no gripper)"""
+        # Solve IK for wrist position with offset
+        arm_q = self.solve_arm_ik(
+            wrist_pos, 
+            wrist_orn * QuestUR3ArmModule.ur3_orn_offset.inv(), 
+            QuestUR3ArmModule.ur3_palm_pos_orn_offset
+        )
+        
+        # Set joint positions in simulation
+        self.set_joint_positions(self.ur3_arm, arm_q)
+        
+        # Get actual end-effector pose for feedback
+        ee_state = pb.getLinkState(self.ur3_arm, self.end_effector_link)
+        ee_pos = np.asarray(ee_state[0])
+        ee_orn = np.asarray(ee_state[1])
+        
+        # Store current joint angles (ensure it's numpy array)
+        self.this_arm_q = np.array(arm_q)
+        
+        # Add to trajectory tracking
+        if self.data_dir is not None:
+            self.trajectory_points.append({
+                'timestamp': time.time(),
+                'target_pos': wrist_pos.copy(),
+                'target_orn': wrist_orn.as_quat().copy(),
+                'actual_pos': ee_pos.copy(),
+                'actual_orn': ee_orn.copy(),
+                'joint_angles': arm_q.copy()
+            })
+        
+        return np.array(arm_q), None, np.array(ee_pos), np.array(ee_orn)  # No hand_q for arm-only
+    
+    def check_delta_joints(self, this_q, prev_q, threshold=0.1):
+        """Check if joint movement is within threshold"""
+        if prev_q is None:
+            return True
+        delta_q = np.abs(np.array(this_q) - np.array(prev_q))
+        return np.all(delta_q < threshold)
+
+    def receive(self):
+        """Receive VR controller data and process commands"""
+        data, _ = self.wrist_listener_s.recvfrom(1024)
+        data_string = data.decode()
+        now = datetime.datetime.now()
+        
+        if data_string.startswith("WorldFrame"):
+            data_string = data_string[11:]
+            data_string = data_string.split(",")
+            data_list = [float(data) for data in data_string]
+            world_frame = np.array(data_list)
+            self.world_frame = world_frame
+            self.wf_receive_ts = now.strftime("%Y-%m-%d-%H-%M-%S")
+            # Use appropriate rest pose based on actual DOF
+            if len(self.ur3_lower_limits) == 6:
+                rest_pose = QuestUR3ArmModule.ARM_REST
+            else:
+                rest_pose = [0.0, -0.498, -0.02, -2.473, -0.013, 2.004, -0.723]  # Panda
+            self.set_joint_positions(self.ur3_arm, rest_pose)
+            os.mkdir(f"data/{self.wf_receive_ts}")
+            np.save(f"data/{self.wf_receive_ts}/WorldFrame.npy", world_frame)
+            print("✅ UR3 World frame set")
+            return None, None
+            
+        elif data_string.startswith("Start"):
+            formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+            self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+            os.mkdir(self.data_dir)
+            self.trajectory_points = []  # Reset trajectory tracking
+            print(f"✅ UR3 trajectory recording started: {self.data_dir}")
+            return None, None
+            
+        elif data_string.startswith("Stop"):
+            if self.data_dir is not None:
+                # Save trajectory data
+                if self.trajectory_points:
+                    np.save(f"{self.data_dir}/ur3_trajectory.npy", self.trajectory_points)
+                    print(f"✅ Saved {len(self.trajectory_points)} trajectory points")
+                self.prev_data_dir = self.data_dir
+            self.data_dir = None
+            return None, None
+            
+        elif data_string.startswith("Remove"):
+            if self.data_dir is not None and os.path.exists(self.data_dir):
+                shutil.rmtree(self.data_dir)
+                print("✅ Current trajectory removed")
+            elif self.prev_data_dir is not None and os.path.exists(self.prev_data_dir):
+                shutil.rmtree(self.prev_data_dir)
+                print("✅ Previous trajectory removed")
+            self.data_dir = None
+            self.prev_data_dir = None
+            return None, None
+            
+        elif data_string.find("LHand") != -1:
+            # Parse VR controller data
+            data_string_ = data_string[7:].split(",")
+            data_list = [float(data) for data in data_string_]
+            wrist_tf = np.array(data_list[:7])
+            head_tf = np.array(data_list[7:14])
+            
+            # Transform coordinates
+            rel_wrist_pos, rel_wrist_rot = self.compute_rel_transform(wrist_tf)
+            rel_head_pos, rel_head_rot = self.compute_rel_transform(head_tf)
+            
+            # Auto-start recording if needed
+            if self.data_dir is None and data_string[0] == "Y":
+                formatted_time = now.strftime("%Y-%m-%d-%H-%M-%S")
+                self.data_dir = f"data/{self.wf_receive_ts}/{formatted_time}"
+                os.mkdir(self.data_dir)
+                self.trajectory_points = []
+                print(f"✅ Auto-started UR3 trajectory recording")
+                
+            return (rel_wrist_pos, rel_wrist_rot), (rel_head_pos, rel_head_rot)
+        
+        return None, None
+
+    def send_ik_result(self, ur3_arm_q, hand_q=None):
+        """Send IK results back to Unity for UR3 visualization"""
+        # Ensure ur3_arm_q is numpy array
+        ur3_arm_q = np.array(ur3_arm_q)
+        delta_result = self.check_delta_joints(ur3_arm_q, self.last_arm_q)
+        
+        if self.data_dir is None:
+            delta_result = "G"  # Green - not recording
+        elif delta_result:
+            delta_result = "Y"  # Yellow - recording and moving smoothly
+        else:
+            delta_result = "N"  # Red - moving too fast
+        
+        # Format message for variable DOF (6 for UR3, 7 for Panda fallback)
+        msg = f"{delta_result}"
+        
+        # Send joint data as-is (Unity now handles variable DOF)
+        for joint_val in ur3_arm_q:
+            msg += f",{joint_val:.3f}"
+        
+        if len(ur3_arm_q) == 6:
+            print(f"  Sent 6 DOF UR3 data to Unity")
+        else:
+            print(f"  Sent {len(ur3_arm_q)} DOF data to Unity")
+        
+        if self.ik_result_s is not None:
+            self.ik_result_s.sendto(msg.encode(), self.ik_result_dest)
+        
+        self.last_arm_q = ur3_arm_q
+        return ur3_arm_q  # Return joint angles for data logging

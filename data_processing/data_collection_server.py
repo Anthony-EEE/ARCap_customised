@@ -7,12 +7,14 @@ import pybullet as pb
 from rigidbodySento import create_primitive_shape
 from ip_config import *
 from realsense_module import DepthCameraModule
-from quest_robot_module import QuestRightArmLeapModule, QuestLeftArmGripperNoRokokoModule
+from quest_robot_module import QuestRightArmLeapModule, QuestLeftArmGripperNoRokokoModule, QuestUR3ArmModule
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--frequency", type=int, default=30)
     parser.add_argument("--handedness", type=str, default="left")
+    parser.add_argument("--robot", type=str, default="panda", choices=["panda", "ur3"], 
+                       help="Robot type: panda (with gripper) or ur3 (arm only)")
     parser.add_argument("--no_camera", action="store_true", default=False)
     args = parser.parse_args()
     c = pb.connect(pb.DIRECT)
@@ -23,9 +25,15 @@ if __name__ == "__main__":
     if not args.no_camera:
         camera = DepthCameraModule(is_decimate=False, visualize=False)
     #rokoko = RokokoModule(VR_HOST, HAND_INFO_PORT, ROKOKO_PORT)
-    if args.handedness == "right":
+    # Robot selection and initialization
+    if args.robot == "ur3":
+        print(f"🤖 Initializing UR3 arm (6-DOF, no gripper) for trajectory tracking...")
+        quest = QuestUR3ArmModule(VR_HOST, LOCAL_HOST, POSE_CMD_PORT, IK_RESULT_PORT, vis_sp=vis_sp)
+    elif args.handedness == "right":
+        print(f"🤖 Initializing Panda right arm with Leap hand...")
         quest = QuestRightArmLeapModule(VR_HOST, LOCAL_HOST, POSE_CMD_PORT, IK_RESULT_PORT, vis_sp=None)
     else:
+        print(f"🤖 Initializing Panda left arm with gripper...")
         quest = QuestLeftArmGripperNoRokokoModule(VR_HOST, LOCAL_HOST, POSE_CMD_PORT, IK_RESULT_PORT, vis_sp=vis_sp)
 
     start_time = time.time()
@@ -51,27 +59,38 @@ if __name__ == "__main__":
                 wrist_pos = wrist[0]
                 head_pos = head_pose[0]
                 head_orn = Rotation.from_quat(head_pose[1])
-                if args.handedness == "right":
-                    hand_tip_pose = wrist_orn.apply(right_positions) + wrist_pos
+                if args.handedness == "right" and args.robot != "ur3":
+                    # hand_tip_pose = wrist_orn.apply(right_positions) + wrist_pos  # Disabled for now
+                    hand_tip_pose = None  # TODO: Implement proper hand tracking
                 else:
-                    hand_tip_pose = None
-                    #hand_tip_pose = wrist_orn.apply(left_positions) + wrist_pos
+                    hand_tip_pose = None  # No hand tracking for UR3 or left-handed modes
                 #hand_tip_pose[[0,1,2,3]] = hand_tip_pose[[1,2,3,0]]
                 arm_q, hand_q, wrist_pos, wrist_orn = quest.solve_system_world(wrist_pos, wrist_orn, hand_tip_pose)
                 action = quest.send_ik_result(arm_q, hand_q)
                 if quest.data_dir is not None:
                     if args.no_camera:
                         point_cloud = np.zeros((1000,3)) # dummy point cloud
-                    if args.handedness == "right":
-                        np.savez(f"{quest.data_dir}/right_data_{time.time()}.npz", right_wrist_pos=wrist_pos, right_wrist_orn=wrist_orn, 
-                                                                                head_pos=head_pos, head_orn=head_orn.as_quat(),
-                                                                                right_arm_q=arm_q, right_hand_q=action,raw_hand_q=hand_q,
-                                                                                right_tip_poses=hand_tip_pose, point_cloud=point_cloud)
+                    
+                    if args.robot == "ur3":
+                        # UR3 arm-only data (no gripper)
+                        np.savez(f"{quest.data_dir}/ur3_data_{time.time()}.npz", 
+                                ur3_wrist_pos=wrist_pos, ur3_wrist_orn=wrist_orn, 
+                                head_pos=head_pos, head_orn=head_orn.as_quat(),
+                                ur3_arm_q=arm_q, point_cloud=point_cloud)
+                    elif args.handedness == "right":
+                        # Panda right arm with Leap hand
+                        np.savez(f"{quest.data_dir}/right_data_{time.time()}.npz", 
+                                right_wrist_pos=wrist_pos, right_wrist_orn=wrist_orn, 
+                                head_pos=head_pos, head_orn=head_orn.as_quat(),
+                                right_arm_q=arm_q, right_hand_q=action, raw_hand_q=hand_q,
+                                right_tip_poses=hand_tip_pose, point_cloud=point_cloud)
                     else:
-                        np.savez(f"{quest.data_dir}/left_data_{time.time()}.npz", left_wrist_pos=wrist_pos, left_wrist_orn=wrist_orn, 
-                                                                                head_pos=head_pos, head_orn=head_orn.as_quat(),
-                                                                                left_arm_q=arm_q, left_hand_q=action, raw_hand_q=hand_q,
-                                                                                left_tip_poses=hand_tip_pose, point_cloud=point_cloud)
+                        # Panda left arm with gripper
+                        np.savez(f"{quest.data_dir}/left_data_{time.time()}.npz", 
+                                left_wrist_pos=wrist_pos, left_wrist_orn=wrist_orn, 
+                                head_pos=head_pos, head_orn=head_orn.as_quat(),
+                                left_arm_q=arm_q, left_hand_q=action, raw_hand_q=hand_q,
+                                left_tip_poses=hand_tip_pose, point_cloud=point_cloud)
         except socket.error as e:
             print(e)
             pass

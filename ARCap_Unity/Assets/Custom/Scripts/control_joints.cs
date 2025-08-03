@@ -22,6 +22,9 @@ public class JointController : MonoBehaviour
     public int client_port = 12345;
     [SerializeField]
     public bool data_collector = false;
+    [SerializeField]
+    [Tooltip("Robot type: 'panda' (7 DOF) or 'ur3' (6 DOF)")]
+    public string robotType = "panda";
     #endregion
     private List<ArticulationBody> articulationBodies = new List<ArticulationBody>();
     private UdpClient client;
@@ -97,9 +100,23 @@ public class JointController : MonoBehaviour
             image_l.color = new Color32(12, 188, 13, 100);
         }
 
-        for (int i=0; i<targetPositions.Count; i++)
+        // Determine expected DOF based on robot type
+        int expectedDOF = UR3Config.GetExpectedDOF(robotType);
+        
+        // Validate command length matches robot DOF
+        if (commands.Length < expectedDOF + 1) // +1 for status command
         {
-            jointCommands.Add(float.Parse(commands[i+1]));
+            Debug.LogWarning($"Insufficient joint commands received. Expected {expectedDOF} for {robotType}, got {commands.Length - 1}");
+            return jointCommands;
+        }
+        
+        // Parse joint commands based on actual robot DOF
+        for (int i = 0; i < expectedDOF; i++)
+        {
+            if (i < targetPositions.Count) // Ensure we don't exceed joint list
+            {
+                jointCommands.Add(float.Parse(commands[i+1]));
+            }
         }
         return jointCommands;
     }
@@ -137,9 +154,29 @@ public class JointController : MonoBehaviour
             image_l.color = new Color32(12, 188, 13, 100);
         }
 
-        for (int i=0; i<targetPositions.Count; i++)
+        // Determine expected DOF based on robot type
+        int expectedDOF = UR3Config.GetExpectedDOF(robotType);
+        
+        // Validate command length matches robot DOF
+        if (commands.Length < expectedDOF + 1) // +1 for status command
         {
-            jointCommands[i] = float.Parse(commands[i+1]);
+            Debug.LogWarning($"Insufficient joint commands received. Expected {expectedDOF} for {robotType}, got {commands.Length - 1}");
+            return;
+        }
+        
+        // Ensure jointCommands list has correct size
+        while (jointCommands.Count < expectedDOF)
+        {
+            jointCommands.Add(0.0f);
+        }
+        
+        // Parse joint commands based on actual robot DOF  
+        for (int i = 0; i < expectedDOF; i++)
+        {
+            if (i < targetPositions.Count) // Ensure we don't exceed joint list
+            {
+                jointCommands[i] = float.Parse(commands[i+1]);
+            }
         }
         updated = true;
     }
@@ -151,7 +188,10 @@ public class JointController : MonoBehaviour
         if (updated)
         {
             updated = false;
-            for (int j = 0; j < jointCommands.Count; j++)
+            int expectedDOF = UR3Config.GetExpectedDOF(robotType);
+            int commandsToProcess = Mathf.Min(jointCommands.Count, expectedDOF, targetPositions.Count);
+            
+            for (int j = 0; j < commandsToProcess; j++)
             {
                 jointInput[j] = jointCommands[j]; // Set the target position
             }

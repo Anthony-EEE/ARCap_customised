@@ -70,6 +70,9 @@ public class MainDataRecorderGripper : MonoBehaviour
     public int sender_port = 12346;
     [SerializeField]
     public string handedness = "R";
+    [SerializeField]
+    [Tooltip("Robot type: 'panda' (with gripper) or 'ur3' (arm only)")]
+    public string robotType = "panda";
     public static int traj_cnt = 0;
 
     #endregion // Unity Inspector Variables
@@ -96,9 +99,16 @@ public class MainDataRecorderGripper : MonoBehaviour
     {
         // Attempt to get the global depth texture
         // This should be a image, get a image and send via redis?
-        rgripper.GetComponent<ArticulationBody>().TeleportRoot(robot_ee.transform.position + robot_ee.transform.rotation * lgripper_rot_offset * lgripper_pos_offset, robot_ee.transform.rotation * lgripper_rot_offset);
         
-            // Should use left eye anchor pose from OVRCameraRig
+        // Update gripper position only for Panda (UR3 has no gripper)
+        if (!UR3Config.IsUR3(robotType) && rgripper != null && robot_ee != null)
+        {
+            rgripper.GetComponent<ArticulationBody>().TeleportRoot(
+                robot_ee.transform.position + robot_ee.transform.rotation * lgripper_rot_offset * lgripper_pos_offset, 
+                robot_ee.transform.rotation * lgripper_rot_offset);
+        }
+        
+        // Should use left eye anchor pose from OVRCameraRig
         var headPose = cameraRig.centerEyeAnchor.position;
         var headRot = cameraRig.centerEyeAnchor.rotation; // Should store them separately. [w,x,y,z]
         m_TimeText.enabled = true;
@@ -167,6 +177,13 @@ public class MainDataRecorderGripper : MonoBehaviour
     
     private float checkPinch()
     {
+        // For UR3, disable gripper controls (arm only)
+        if (UR3Config.IsUR3(robotType))
+        {
+            return 1.0f; // Return "open" state for UR3 (no gripper)
+        }
+        
+        // Panda gripper controls
         // Check for simultaneous button presses
         bool closePressed = OVRInput.GetDown(OVRInput.RawButton.LHandTrigger);
         bool openPressed = OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger);
@@ -190,13 +207,6 @@ public class MainDataRecorderGripper : MonoBehaviour
         }
         // Add after line 190:
         Debug.Log($"Gripper state changed to: {(gripperClosed ? "CLOSED" : "OPEN")}");
-        // Alternative button mapping (X/Y buttons):
-        // Uncomment these lines if you prefer X/Y buttons:
-        // bool closeAlt = OVRInput.GetDown(OVRInput.RawButton.X);
-        // bool openAlt = OVRInput.GetDown(OVRInput.RawButton.Y);
-        // if (closeAlt && openAlt) { /* conflict */ }
-        // else if (closeAlt) { gripperClosed = true; }
-        // else if (openAlt) { gripperClosed = false; }
         
         // Visual feedback when gripper state changes
         if (gripperClosed != lastGripperState)
@@ -270,11 +280,37 @@ public class MainDataRecorderGripper : MonoBehaviour
         folder_path = CoordinateFrameGripper.folder_path;
         // Visualize coordinate frame pos
 
-        robot = GameObject.Find("panda_link0_vis");
-        robot_ee = GameObject.Find("panda_hand_vis");
-        rgripper = GameObject.Find("gripper_base_vis");
-        robot_vis = GameObject.Find("panda_vis");
-        gripper_vis = GameObject.Find("gripper_vis");
+        // Find robot objects based on robot type
+        if (UR3Config.IsUR3(robotType))
+        {
+            // UR3 objects (no gripper)
+            robot = GameObject.Find(UR3Config.UR3_BASE_OBJECT);
+            robot_ee = GameObject.Find(UR3Config.UR3_END_EFFECTOR_OBJECT);
+            robot_vis = GameObject.Find(UR3Config.UR3_ROBOT_ROOT);
+            rgripper = null; // No gripper for UR3
+            gripper_vis = null; // No gripper visualization
+            
+            if (robot == null || robot_ee == null || robot_vis == null)
+            {
+                m_TimeText.text = "UR3 objects not found! Check GameObject names.";
+                Debug.LogError($"Missing UR3 objects: robot={robot}, robot_ee={robot_ee}, robot_vis={robot_vis}");
+            }
+        }
+        else
+        {
+            // Panda objects (with gripper)
+            robot = GameObject.Find("panda_link0_vis");
+            robot_ee = GameObject.Find("panda_hand_vis");
+            rgripper = GameObject.Find("gripper_base_vis");
+            robot_vis = GameObject.Find("panda_vis");
+            gripper_vis = GameObject.Find("gripper_vis");
+            
+            if (robot == null || robot_ee == null || rgripper == null || robot_vis == null || gripper_vis == null)
+            {
+                m_TimeText.text = "Panda objects not found! Check GameObject names.";
+                Debug.LogError($"Missing Panda objects: robot={robot}, robot_ee={robot_ee}, rgripper={rgripper}, robot_vis={robot_vis}, gripper_vis={gripper_vis}");
+            }
+        }
         GameObject frame = GameObject.Find("coordinate_vis");
         m_TimeText.text = "Object found";
         frame.transform.position = CoordinateFrameGripper.last_pos;
