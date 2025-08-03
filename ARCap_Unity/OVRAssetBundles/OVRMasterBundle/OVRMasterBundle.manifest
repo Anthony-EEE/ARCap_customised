@@ -1,5 +1,5 @@
 ManifestFileVersion: 0
-CRC: 640687568
+CRC: 3630011958
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
@@ -63,13 +63,12 @@ AssetBundleManifest:
         Dependency_5: asset_obj1
         Dependency_6: asset_png0
         Dependency_7: asset_asset0
+        Dependency_8: asset_asset1
+        Dependency_9: asset_dae0
     Info_7:
-      Name: asset_psd0
-      Dependencies: {}
-    Info_8:
       Name: asset_shader0
       Dependencies: {}
-    Info_9:
+    Info_8:
       Name: asset_prefab0
       Dependencies:
         Dependency_0: asset_shader0
@@ -77,31 +76,38 @@ AssetBundleManifest:
         Dependency_2: asset_mat1
         Dependency_3: asset_png0
         Dependency_4: asset_asset0
-    Info_10:
+        Dependency_5: asset_dae0
+    Info_9:
       Name: asset_mat0
       Dependencies:
         Dependency_0: asset_shader0
         Dependency_1: asset_png0
-    Info_11:
+    Info_10:
       Name: asset_mat1
       Dependencies:
         Dependency_0: asset_shader0
-    Info_12:
+    Info_11:
       Name: asset_ttf0
       Dependencies: {}
-    Info_13:
+    Info_12:
       Name: asset_obj0
       Dependencies:
         Dependency_0: asset_shader0
         Dependency_1: asset_png0
-    Info_14:
+    Info_13:
       Name: asset_obj1
       Dependencies:
         Dependency_0: asset_shader0
-    Info_15:
+    Info_14:
       Name: asset_png0
       Dependencies: {}
-    Info_16:
+    Info_15:
       Name: asset_asset0
       Dependencies:
         Dependency_0: asset_shader0
+    Info_16:
+      Name: asset_asset1
+      Dependencies: {}
+    Info_17:
+      Name: asset_dae0
+      Dependencies: {}

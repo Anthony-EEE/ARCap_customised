@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1528945603
+CRC: 4023090222
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1aac6222c0ff96355f278ef9502160b4
+    Hash: 83a5539f752818318f1aee0258a27781
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 38edf0ec50ebd456079e534291dddae3
+    Hash: 3d689c0c5a3243f7ce8c581e22da40fd
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 1aac6222c0ff96355f278ef9502160b4
+    Hash: 83a5539f752818318f1aee0258a27781
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -28,6 +28,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
+- Class: 64
+  Script: {instanceID: 0}
 - Class: 81
   Script: {instanceID: 0}
 - Class: 114
@@ -37,7 +39,11 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 7e933e81d3c20c74ea6fdc708a67e3a5, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: 7e4bda610424f0a43bec5f789f808bd9, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 8b2685e7e7719cd43814f41f35664c0b, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 289e60035633f914a8cee5921b1b836d, type: 3}
 - Class: 114
@@ -45,23 +51,45 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d607ea46a579d44c4b19a6322ce4b9b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e76943ac7e7394f3e969f0c048b26639, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: ddd9160392010594198e19590e3e2244, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 63b6193734b4c8444bcfdf4e9953fe2b, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 093b4031c300bd241849c0c39523b111, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 074632cab556f5b408839af8574308df, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fba5fd74d37a6cf4284698624eb8f6aa, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1c0c8ba1123c5f949b20e50d5dd6afe4, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fbf4c79288754864b8d522b69f4b52a8, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e9090ae501ff9cd459bec5271d40249c, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 13ec27b72d4891b4e81b76353c8abff4, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
+  Script: {fileID: 11500000, guid: 46398bc5d6905ad429a6d2d973afe002, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: e76943ac7e7394f3e969f0c048b26639, type: 3}
+  Script: {fileID: 11500000, guid: fae53a797b5479c43b9a3aeac7e35e5c, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
+  Script: {fileID: 11500000, guid: 7631001c063f69d4495bca90731abab2, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 213
@@ -71,6 +99,8 @@ ClassTypes:
 - Class: 223
   Script: {instanceID: 0}
 - Class: 224
+  Script: {instanceID: 0}
+- Class: 171741748
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers:
 - AssemblyName: Oculus.VR
@@ -92,6 +122,7 @@ SerializeReferenceClassIdentifiers:
 - AssemblyName: meta.xr.mrutilitykit
   ClassName: Meta.XR.MRUtilityKit.MRUK/MRUKSettings
 Assets:
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/upperarm.prefab
 - Packages/com.meta.xr.depthapi/Runtime/Core/Prefabs/EnvironmentDepthOcclusion.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/LivingRoom/LivingRoom05.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Tools/ImmersiveSceneDebugger.prefab
@@ -99,7 +130,11 @@ Assets:
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Office/Office08.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/LivingRoom/LivingRoom07.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Tools/MRUK.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist1.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/forearm.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Bedroom/Bedroom00.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist3.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/shoulder.prefab
 - Packages/com.meta.xr.sdk.core/Prefabs/OVRCameraRig.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Office/Office09.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Bedroom/Bedroom06.prefab
@@ -107,10 +142,14 @@ Assets:
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/LivingRoom/LivingRoom02.prefab
 - Assets/Custom/Prefabs/UiRenderDepth.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Other/OtherRoom04_empty.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist2.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur3_vis.prefab
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Tools/Deprecated/EffectMesh_Deprecated.prefab
 - Packages/com.meta.xr.mrutilitykit/Core/Rooms/Prefabs/Bedroom/Bedroom03.prefab
 Dependencies:
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_asset0
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_dae0
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_mat0
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_mat1
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_png0

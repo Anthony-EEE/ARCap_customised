@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1545754596
+CRC: 156812321
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: fe3906adc5e7162f8d399a286a0a7358
+    Hash: e1afe6ff2b9b07f7d2cb9a6d8174bf42
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 36005fc57971a01aa832b8637d83dc07
+    Hash: ea0fcd09876b18b77a73783c7c231274
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: fe3906adc5e7162f8d399a286a0a7358
+    Hash: e1afe6ff2b9b07f7d2cb9a6d8174bf42
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -22,6 +22,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: 11500000, guid: ab2114bdc8544297b417dfefe9f1e410, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: efa1458c2bc55e04b872c61942be2866, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: a7d75bea1662418ab5f9e0c22110bc09, type: 3}
 - Class: 114
@@ -77,6 +79,7 @@ Assets:
 - Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Drop Shadow.mat
 - Assets/Resources/OVRBuildConfig.asset
 - Assets/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset
+- Assets/Resources/OVROverlayCanvasSettings.asset
 - Assets/TextMesh Pro/Resources/TMP Settings.asset
 - Assets/Resources/InputActions.asset
 - Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset

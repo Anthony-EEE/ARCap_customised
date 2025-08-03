@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1506724712
+CRC: 3123351081
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c550a1a395a5b9c0a38337f4b3219e29
+    Hash: c7596176c7bb49d616a8e5b52a13b40b
   TypeTreeHash:
     serializedVersion: 2
     Hash: dd7842fb47d6ddd49a5b4c675951b2b8
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: c550a1a395a5b9c0a38337f4b3219e29
+    Hash: c7596176c7bb49d616a8e5b52a13b40b
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -49,21 +49,35 @@ SerializeReferenceClassIdentifiers:
   ClassName: UnityEngine.TextCore.GlyphRect
 Assets:
 - Assets/Custom/Models/franka_arm/meshes/collision/link4_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist2_0.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/thumb_fingertip_1.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link3_1.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link2_1.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/palm_lower_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist3_0.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link1_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_11.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/shoulder_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_6.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_12.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/fingertip_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist2_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_10.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link0_1.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/mcp_joint_1.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/pip_1.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/thumb_pip_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_0.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link7_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_9.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/shoulder_0.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist1_0.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/forearm_0.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/dip_1.asset
 - Assets/Custom/Models/franka_arm/meshes/collision/link5_1.asset
 - Packages/com.meta.xr.sdk.sharedassets/Runtime/Shared/Samples/Fonts/Roboto-Regular
   SDF.asset
 - Assets/Custom/Models/leap_hand/meshes/collision/thumb_dip_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/upperarm_0.asset
 Dependencies:
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_shader0

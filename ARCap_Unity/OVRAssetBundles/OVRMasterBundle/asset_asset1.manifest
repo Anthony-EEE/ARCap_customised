@@ -1,0 +1,36 @@
+ManifestFileVersion: 0
+CRC: 911042274
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: ad23d4469ea0e2b9119344ba8370f9bd
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 2edfeee0fffd52782c286e532ff06aef
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: ad23d4469ea0e2b9119344ba8370f9bd
+HashAppended: 0
+ClassTypes:
+- Class: 43
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_4.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_2.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/forearm_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist1_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_13.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_8.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_3.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/upperarm_3.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/wrist3_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/upperarm_1.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_14.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/forearm_2.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_5.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/base_7.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/forearm_3.asset
+- Assets/Custom/Models/universal_robots/urdf/ur_description/meshes/ur3/collision/upperarm_2.asset
+Dependencies: []

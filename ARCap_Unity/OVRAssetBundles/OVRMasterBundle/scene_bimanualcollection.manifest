@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 2701655399
+CRC: 1831729950
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0c0e5ac64a153427001ee470b6e89eef
+    Hash: f61f35efbc456cd3841fe09a2cd2acb1
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 2ae874de05e7b704b6b3498fe414ccc8
+    Hash: d7384fb82051a4b67e16f5daa9ea99f3
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 0c0e5ac64a153427001ee470b6e89eef
+    Hash: f61f35efbc456cd3841fe09a2cd2acb1
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -57,7 +57,19 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d607ea46a579d44c4b19a6322ce4b9b2, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 76add797bdb1d8c4b8276633f6e67167, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 555725d48e9051a4bb6b8d45178c2fdd, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: e76943ac7e7394f3e969f0c048b26639, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: ddd9160392010594198e19590e3e2244, type: 3}
 - Class: 114
@@ -68,6 +80,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 093b4031c300bd241849c0c39523b111, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: c2739b11a8980aa48b52271bc429c745, type: 3}
 - Class: 114
@@ -92,16 +106,6 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 7631001c063f69d4495bca90731abab2, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 1c3535f7ebedfbf45a5a9c0e3c64fa71, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: 555725d48e9051a4bb6b8d45178c2fdd, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: e76943ac7e7394f3e969f0c048b26639, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: de27d7f2f20024e18898941292d6c164, type: 3}
-- Class: 114
-  Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -127,6 +131,8 @@ Assets:
 - Assets/Custom/Scenes/BimanualCollection.unity
 Dependencies:
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_asset0
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_asset1
+- C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_dae0
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_mat0
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_mat1
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_obj0

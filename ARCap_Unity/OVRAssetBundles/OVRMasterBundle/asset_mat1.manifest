@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1381226711
+CRC: 1534268155
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a5e6d517361cc541e91e60d406abe3dd
+    Hash: ade0032423cdbb87c17a293d2dbd0cdf
   TypeTreeHash:
     serializedVersion: 2
     Hash: 5e762ccb57c4caaabbb5a4199ac82c23
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: a5e6d517361cc541e91e60d406abe3dd
+    Hash: ade0032423cdbb87c17a293d2dbd0cdf
 HashAppended: 0
 ClassTypes:
 - Class: 21
@@ -19,6 +19,7 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Packages/com.meta.xr.mrutilitykit/Core/Materials/YELLOW_Screen.mat
+- Assets/Custom/Models/universal_robots/urdf/Materials/LightGrey.mat
 - Assets/Custom/Models/gripper_description/gripper_description/Materials/green.mat
 Dependencies:
 - C:/Users/11424/Documents/ARCap_customised/ARCap_Unity/OVRAssetBundles/OVRMasterBundle/asset_shader0

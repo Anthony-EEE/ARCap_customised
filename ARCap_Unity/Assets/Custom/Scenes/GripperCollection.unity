@@ -3035,6 +3035,9 @@ MonoBehaviour:
   overridePerLayerColorScaleAndOffset: 0
   colorScale: {x: 1, y: 1, z: 1, w: 1}
   colorOffset: {x: 0, y: 0, z: 0, w: 0}
+  passthroughLayerResumed:
+    m_PersistentCalls:
+      m_Calls: []
   colorMapEditorType_: 0
   colorMapEditorGradient:
     serializedVersion: 2
@@ -5590,7 +5593,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1276362564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7418,6 +7421,79 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1625430953}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1625827385
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1613184858259796304, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1737501953214236673, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: data_collector
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7976784480701419181, guid: 64eefb5f7969b6f4986e939c304a0179,
+        type: 3}
+      propertyPath: m_Name
+      value: ur3_vis
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 64eefb5f7969b6f4986e939c304a0179, type: 3}
 --- !u!1001 &1626652702
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8613,7 +8689,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1833847285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8649,6 +8725,7 @@ MonoBehaviour:
   local_ip: 10.5.70.193
   client_port: 12345
   data_collector: 1
+  robotType: panda
 --- !u!114 &1833847286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8782,6 +8859,7 @@ MonoBehaviour:
   listen_port: 65432
   sender_port: 12346
   handedness: L
+  robotType: ur3
 --- !u!114 &1883148393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10078,3 +10156,4 @@ SceneRoots:
   - {fileID: 1109885153}
   - {fileID: 67724081}
   - {fileID: 1338376450}
+  - {fileID: 1625827385}
