@@ -1,8 +1,8 @@
 import pybullet as pb
 import pybullet_data
 import numpy as np
-from scipy.spatial.transform import Rotation
 import time
+from scipy.spatial.transform import Rotation
 
 class RobotTester:
     """Universal robot testing platform - supports Panda now, UR3 later"""
@@ -76,8 +76,36 @@ class RobotTester:
                 useFixedBase=True
             )
             
-            # Load gripper (using Panda gripper for now)
-            self.gripper_id = pb.loadURDF("data_processing/assets/gripper/franka_panda_tri_gripper.urdf")
+            # First, get the UR3 end-effector position for gripper mounting
+            ee_state = pb.getLinkState(self.arm_id, self.end_effector_link)
+            ee_pos = np.array(ee_state[0])
+            ee_orn = Rotation.from_quat(ee_state[1])
+            
+            # Calculate gripper mounting position
+            gripper_pos = ee_pos + (ee_orn * self.gripper_mount_orn_offset).apply(self.gripper_mount_pos_offset)
+            gripper_orn = (ee_orn * self.gripper_mount_orn_offset).as_quat()
+            
+            print(f"🔍 UR3 end-effector at: {ee_pos}")
+            print(f"🔧 Loading gripper at calculated position: {gripper_pos}")
+            
+            # Load gripper (using realistic susgrip_2f gripper with 3D meshes) AT THE CORRECT POSITION
+            print("📦 Loading realistic susgrip_2f gripper with detailed 3D meshes...")
+            self.gripper_id = pb.loadURDF(
+                "ur3_test/susgrip_2f_realistic.urdf",
+                basePosition=gripper_pos,
+                baseOrientation=gripper_orn
+            )
+            
+            # Make gripper more visible by changing colors to bright/distinct ones
+            try:
+                pb.changeVisualShape(self.gripper_id, -1, rgbaColor=[1, 1, 0, 1])  # Yellow base
+                for i in range(pb.getNumJoints(self.gripper_id)):
+                    if i == 0:  # left finger
+                        pb.changeVisualShape(self.gripper_id, i, rgbaColor=[0, 1, 0, 1])  # Bright green
+                    elif i == 1:  # right finger  
+                        pb.changeVisualShape(self.gripper_id, i, rgbaColor=[1, 0, 1, 1])  # Bright magenta
+            except Exception as e:
+                print(f"⚠️ Could not change gripper colors: {e}")
             
             # Disable gravity for gripper to prevent flying away
             pb.changeDynamics(self.gripper_id, -1, mass=0)
@@ -90,8 +118,14 @@ class RobotTester:
             
             # UR3-specific parameters
             self.ARM_REST = [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0]
-            self.GRIPPER_OPEN = [0.04, 0.04]
-            self.GRIPPER_CLOSE = [0.0, 0.0]
+            
+            # Susgrip_2f gripper parameters (prismatic slider joints)
+            # Based on URDF joint limits: lower="0.0" upper="0.015"
+            self.GRIPPER_OPEN = [0.015, 0.015]   # Maximum slider extension for open position
+            self.GRIPPER_CLOSE = [0.0, 0.0]     # Minimum slider position for closed position
+            
+            # Map gripper joints: 0=left slider, 1=right slider (prismatic)
+            # Additional joints (2-9) are continuous rotation joints for finger segments
             
             # Find end-effector link for UR3
             num_joints = pb.getNumJoints(self.arm_id)
@@ -121,9 +155,11 @@ class RobotTester:
                 self.end_effector_link = max(0, num_joints - 2)
                 print(f"⚠️ Using fallback link as end-effector: index {self.end_effector_link}")
             
-            # UR3-specific gripper mount offsets
-            self.gripper_mount_pos_offset = np.array([0.0, 0.0, 0.0])
-            self.gripper_mount_orn_offset = Rotation.from_euler("xyz", [0., 0., 0.])
+            # UR3-specific gripper mount offsets (create proper flange connection)
+            # Mount gripper slightly forward from flange center to create realistic connection
+            self.gripper_mount_pos_offset = np.array([0.0, 0.0, 0.05])  # 5cm forward from flange
+            # Rotate gripper to align properly with UR3 end-effector (susgrip facing forward)
+            self.gripper_mount_orn_offset = Rotation.from_euler("xyz", [np.pi, 0., 0.])
             
             # Get joint limits
             self.joint_lower_limits, self.joint_upper_limits, self.joint_ranges = self.get_joint_limits(self.arm_id)
@@ -131,12 +167,24 @@ class RobotTester:
             print(f"✅ Loaded UR3: {pb.getNumJoints(self.arm_id)} total joints, End-effector link: {self.end_effector_link}")
             print(f"✅ Gripper: {pb.getNumJoints(self.gripper_id)} joints")
             
-            # IMPORTANT: Mount gripper immediately after loading
-            print("🔧 Mounting gripper to UR3 end-effector...")
-            self.update_gripper_position()
+            # Debug: Print gripper initial position
+            gripper_pos, gripper_orn = pb.getBasePositionAndOrientation(self.gripper_id)
+            print(f"🔍 Gripper initial position: {gripper_pos}")
+            print(f"🔍 Gripper initial orientation: {gripper_orn}")
             
-            # Create a constraint to keep gripper attached to end-effector
-            ee_state = pb.getLinkState(self.arm_id, self.end_effector_link)
+            # Debug: Print gripper joint information
+            print(f"🔍 Gripper joint details:")
+            for i in range(pb.getNumJoints(self.gripper_id)):
+                joint_info = pb.getJointInfo(self.gripper_id, i)
+                print(f"  Joint {i}: {joint_info[1].decode('utf-8')} -> {joint_info[12].decode('utf-8')}")
+            
+            # IMPORTANT: Create constraint to keep gripper attached
+            print("🔧 Creating rigid constraint between UR3 and gripper...")
+            
+            print(f"🔧 Gripper already positioned at: {gripper_pos}")
+            print(f"🔧 Gripper orientation: {gripper_orn}")
+            
+            # Create simple direct constraint between UR3 and gripper
             self.gripper_constraint = pb.createConstraint(
                 parentBodyUniqueId=self.arm_id,
                 parentLinkIndex=self.end_effector_link,
@@ -144,11 +192,60 @@ class RobotTester:
                 childLinkIndex=-1,
                 jointType=pb.JOINT_FIXED,
                 jointAxis=[0, 0, 0],
-                parentFramePosition=[0, 0, 0],
+                parentFramePosition=self.gripper_mount_pos_offset.tolist(),
                 childFramePosition=[0, 0, 0]
             )
             
-            print("✅ Gripper mounted and constrained successfully!")
+            # Create visual flange at the connection point
+            flange_visual = pb.createVisualShape(
+                shapeType=pb.GEOM_CYLINDER,
+                radius=0.015,  # 1.5cm radius flange
+                length=0.02,   # 2cm thick
+                rgbaColor=[0.8, 0.8, 0.8, 1.0]  # Light gray
+            )
+            
+            # Position flange at the connection point
+            flange_pos = ee_pos + (ee_orn).apply(self.gripper_mount_pos_offset * 0.5)  # Halfway point
+            
+            self.flange_id = pb.createMultiBody(
+                baseMass=0.001,  # Very light
+                baseVisualShapeIndex=flange_visual,
+                basePosition=flange_pos,
+                baseOrientation=ee_state[1]
+            )
+            
+            # Add visual connection line from UR3 to gripper
+            pb.addUserDebugLine(
+                ee_pos.tolist(), 
+                gripper_pos.tolist(), 
+                lineColorRGB=[1, 0, 0], 
+                lineWidth=5, 
+                lifeTime=0
+            )
+            
+            # Step simulation to ensure constraint takes effect
+            for _ in range(10):
+                pb.stepSimulation()
+            
+            print("✅ Gripper mounted with flange adapter and constrained successfully!")
+            
+            # Debug: Print final positions after mounting
+            final_gripper_pos, final_gripper_orn = pb.getBasePositionAndOrientation(self.gripper_id)
+            flange_pos, flange_orn = pb.getBasePositionAndOrientation(self.flange_id)
+            
+            print(f"🔍 UR3 end-effector position: {ee_state[0]}")
+            print(f"🔍 Flange adapter position: {flange_pos}")
+            print(f"🔍 Gripper final position: {final_gripper_pos}")
+            print(f"🔍 Mount chain: UR3 → Gripper (with flange visual)")
+            
+            # Verify they are close to each other
+            distance = np.linalg.norm(np.array(final_gripper_pos) - ee_pos)
+            print(f"🔍 Distance between UR3 end-effector and gripper: {distance:.4f}m")
+            if distance > 0.1:  # 10cm
+                print(f"⚠️ WARNING: Gripper is {distance:.2f}m away from UR3! Connection may have failed.")
+            else:
+                print(f"✅ Connection successful: gripper is {distance*100:.1f}cm from UR3 end-effector")
+            
             self.print_joint_info()
             
         except Exception as e:
@@ -183,25 +280,7 @@ class RobotTester:
                     pb.resetJointState(robot_id, jid, joint_positions[i])
             jid += 1
 
-    def update_gripper_position(self):
-        """Update gripper position to match arm end-effector"""
-        try:
-            if not hasattr(self, 'gripper_constraint'):
-                ee_state = pb.getLinkState(self.arm_id, self.end_effector_link)
-                ee_pos = np.array(ee_state[0])
-                ee_orn = Rotation.from_quat(ee_state[1])
-                
-                print(f"🔍 End-effector link {self.end_effector_link} position: {ee_pos}")
-                
-                gripper_pos = ee_pos + (ee_orn * self.gripper_mount_orn_offset).apply(self.gripper_mount_pos_offset)
-                gripper_orn = (ee_orn * self.gripper_mount_orn_offset).as_quat()
-                
-                print(f"🔧 Initial gripper positioning at: {gripper_pos}")
-                pb.resetBasePositionAndOrientation(self.gripper_id, gripper_pos, gripper_orn)
-            else:
-                print("🔗 Gripper position managed by constraint")
-        except Exception as e:
-            print(f"❌ Error updating gripper position: {e}")
+
         
     def reset_to_home(self):
         """Reset robot to home position"""
@@ -368,8 +447,21 @@ class RobotTester:
         self.interactive_control()
         
     def close(self):
-        """Close PyBullet connection"""
-        pb.disconnect()
+        """Close PyBullet connection and cleanup"""
+        try:
+            # Cleanup constraints if they exist
+            if hasattr(self, 'gripper_constraint'):
+                pb.removeConstraint(self.gripper_constraint)
+            
+            # Cleanup flange adapter if it exists
+            if hasattr(self, 'flange_id'):
+                pb.removeBody(self.flange_id)
+                
+            print("🧹 Cleaned up constraints and flange adapter")
+        except Exception as e:
+            print(f"⚠️ Cleanup warning: {e}")
+        finally:
+            pb.disconnect()
 
 # Main execution
 if __name__ == "__main__":
